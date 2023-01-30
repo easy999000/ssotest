@@ -5,6 +5,10 @@ VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ssotest", "ssotest\ssotest.csproj", "{805B5621-2604-443F-BDC4-95AD63E51BE9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ssoClient", "ssoClient\ssoClient.csproj", "{37504061-40D6-45B3-82E0-5DA016DD1E3F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ssoCommon", "ssoCommon\ssoCommon.csproj", "{E7A0D473-7E15-424B-8823-24942AAE90E1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{805B5621-2604-443F-BDC4-95AD63E51BE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{805B5621-2604-443F-BDC4-95AD63E51BE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{805B5621-2604-443F-BDC4-95AD63E51BE9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{37504061-40D6-45B3-82E0-5DA016DD1E3F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37504061-40D6-45B3-82E0-5DA016DD1E3F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37504061-40D6-45B3-82E0-5DA016DD1E3F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37504061-40D6-45B3-82E0-5DA016DD1E3F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E7A0D473-7E15-424B-8823-24942AAE90E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7A0D473-7E15-424B-8823-24942AAE90E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7A0D473-7E15-424B-8823-24942AAE90E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7A0D473-7E15-424B-8823-24942AAE90E1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

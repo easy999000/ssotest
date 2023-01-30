@@ -23,18 +23,16 @@ namespace ssotest.Controllers
 
                 if (tokenValue == this.Request.Cookies["logintoken"] + "|aaa")
                 {
-
                     var b1 = UrlHelper.TryParse(backurl, out UrlHelper urlHelper);
 
                     if (!b1)
                     {
-                        return this.Redirect(this.Request.Scheme+"://"+this.Request.Host.ToString());
+                        return this.Redirect(this.Request.Scheme + "://" + this.Request.Host.ToString());
                     }
                     urlHelper.AddQuery("ssokey", this.Request.Cookies["logintoken"]);
                     return this.Redirect(urlHelper.GetUrl());
 
                 }
-
             }
 
             if (string.IsNullOrWhiteSpace(name))
@@ -52,7 +50,15 @@ namespace ssotest.Controllers
             var value = key + "|aaa";
             AnalogData.GetAnalogData("cookie").SetData(key, value);
 
-            this.Response.Cookies.Append("logintoken", key);
+            string cookieDomain = "";
+            if (this.Request.Host.Host.Contains('.'))
+            {
+                var hostList = this.Request.Host.Host.Split(".");
+                cookieDomain = $"{hostList[hostList.Length - 2]}.{hostList[hostList.Length - 1]}";
+
+            }
+
+            this.Response.Cookies.Append("logintoken", key,new CookieOptions { Domain= cookieDomain });
 
 
             var b2 = UrlHelper.TryParse(backurl, out UrlHelper urlHelper2);
