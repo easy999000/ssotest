@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ssotest", "ssotest\ssotest.csproj", "{805B5621-2604-443F-BDC4-95AD63E51BE9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ssoCenter", "ssotest\ssoCenter.csproj", "{805B5621-2604-443F-BDC4-95AD63E51BE9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ssoClient", "ssoClient\ssoClient.csproj", "{37504061-40D6-45B3-82E0-5DA016DD1E3F}"
 EndProject

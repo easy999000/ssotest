@@ -1,4 +1,4 @@
-namespace ssotest.Models
+namespace ssoCenter.Models
 {
     public class ErrorViewModel
     {

@@ -1,3 +1,5 @@
+using ssoCommon;
+
 namespace ssoClient
 {
     public class Program
@@ -6,10 +8,18 @@ namespace ssoClient
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Services.AddDistributedMemoryCache();
+            builder.Services.AddSession(a => { });
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
             var app = builder.Build();
+
+            IConfiguration config = app.Services.GetRequiredService<IConfiguration>();
+
+            ConfigOption.DefaultConfig = new ConfigOption();
+
+            config.Bind("ConfigOption", ConfigOption.DefaultConfig);
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
@@ -21,10 +31,21 @@ namespace ssoClient
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
+            app.UseSession();
             app.UseRouting();
 
             app.UseAuthorization();
+
+            app.Use((context, next) =>
+            {
+                if (string.IsNullOrWhiteSpace(ConfigOption.DefaultConfig.CurrentDomain)
+                    && context.Request.Host.Host.Contains('.'))
+                {
+                    ConfigOption.DefaultConfig.CurrentDomain ="http://"+ context.Request.Host.ToString();
+                }
+
+                return next.Invoke();
+            });
 
             app.MapControllerRoute(
                 name: "default",

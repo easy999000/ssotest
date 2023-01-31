@@ -1,8 +1,24 @@
-﻿@{
+﻿@using ssoCommon;
+@{
     ViewData["Title"] = "Home Page";
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h3  >
+        当前登入账号:@(AnalogData.GetAnalogData(AnalogDataEnum.LoginUser)
+        .GetData<UserInfo>(this.Context.Request.Cookies["logintoken"])?.Name)
+    </h3>
+    <div>
+        客户端站点:
+        @{
+            foreach (var item in ConfigOption.DefaultConfig.ClientDomain)
+            {
+                <text>
+                    <div><a target="_blank" href="@item">@item</a></div>
+                </text> 
+            }
+             
+        }
+
+    </div>
 </div>

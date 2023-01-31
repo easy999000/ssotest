@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
+using ssoCommon;
 
-
-namespace ssotest.Controllers
+namespace ssoCenter.Controllers
 {
     public class SSOController : Controller
     {
@@ -16,12 +16,14 @@ namespace ssotest.Controllers
         public IActionResult Login(string name, string password, string backurl = "")
         {
             this.ViewData["msg"] = string.Empty;
-            if (!string.IsNullOrWhiteSpace(this.Request.Cookies["logintoken"]))
+            var loginID = this.Request.Cookies["logintoken"];
+            if (!string.IsNullOrWhiteSpace(loginID))
             {
 
-                var tokenValue = AnalogData.GetAnalogData("cookie").GetData(this.Request.Cookies["logintoken"]);
+                var tokenValue = AnalogData.GetAnalogData(AnalogDataEnum.LoginUser).GetData<UserInfo>(loginID);
 
-                if (tokenValue == this.Request.Cookies["logintoken"] + "|aaa")
+                if (tokenValue != null
+                    && !string.IsNullOrWhiteSpace(tokenValue.LoginMark))
                 {
                     var b1 = UrlHelper.TryParse(backurl, out UrlHelper urlHelper);
 
@@ -29,27 +31,47 @@ namespace ssotest.Controllers
                     {
                         return this.Redirect(this.Request.Scheme + "://" + this.Request.Host.ToString());
                     }
-                    urlHelper.AddQuery("ssokey", this.Request.Cookies["logintoken"]);
+                    urlHelper.AddQuery("ssotoken", loginID);
                     return this.Redirect(urlHelper.GetUrl());
 
                 }
             }
-
+            ///有无账号信息
             if (string.IsNullOrWhiteSpace(name))
             {
                 return View();
             }
-
-            var pass = AnalogData.GetAnalogData("password").GetData(name);
+            ///验证秘密
+            var pass = AnalogData.GetAnalogData(AnalogDataEnum.Password).GetData<string>(name);
             if (pass != password)
             {
                 this.ViewData["msg"] = "密码或账号错误";
                 return View();
             }
-            var key = name + $"{DateTime.Now.ToFileTime()}";
-            var value = key + "|aaa";
-            AnalogData.GetAnalogData("cookie").SetData(key, value);
+            ///登陆成功,生成令牌
+            ///
 
+            var rand = new Random();
+
+            var baseKey = $"{name}{DateTime.Now.ToFileTime()}";
+
+            ///严谨来说,用户的cookie令牌,授权跳转登录令牌,本地存储登陆信息的key,应该是各不相同.
+            ///并且授权跳转令牌时间不宜过长,而且要防止撞库.
+            ///这里演示不做太严谨处理.
+
+            loginID = $"loginKey{baseKey}";
+            var loginMark = $"{baseKey}|{rand.Next(1000, 9999)}";
+
+            UserInfo loginUser = new UserInfo();
+            loginUser.LoginTime = DateTime.Now;
+            loginUser.Name = name;
+            loginUser.LoginMark = loginMark;
+
+            ///存储登陆信息 
+            AnalogData.GetAnalogData(AnalogDataEnum.LoginUser).SetData(loginID, loginUser);
+
+
+            //设置用户cookie
             string cookieDomain = "";
             if (this.Request.Host.Host.Contains('.'))
             {
@@ -58,7 +80,7 @@ namespace ssotest.Controllers
 
             }
 
-            this.Response.Cookies.Append("logintoken", key,new CookieOptions { Domain= cookieDomain });
+            this.Response.Cookies.Append("logintoken", loginID, new CookieOptions { Domain = cookieDomain });
 
 
             var b2 = UrlHelper.TryParse(backurl, out UrlHelper urlHelper2);
@@ -67,12 +89,39 @@ namespace ssotest.Controllers
             {
                 return this.Redirect(this.Request.Scheme + "://" + this.Request.Host.ToString());
             }
-            urlHelper2.AddQuery("ssokey", key);
+            urlHelper2.AddQuery("ssotoken", loginID);
             return this.Redirect(urlHelper2.GetUrl());
 
 
         }
 
+        public MsgInfo<UserInfo> VerifyToken(string loginID)
+        {
 
+            var tokenValue = AnalogData.GetAnalogData(AnalogDataEnum.LoginUser).GetData<UserInfo>(loginID);
+
+            if (tokenValue != null
+                && !string.IsNullOrWhiteSpace(tokenValue.LoginMark))
+            {
+                return new MsgInfo<UserInfo> { Code = 1, Msg = "", Data = tokenValue };
+
+
+            }
+            else
+            {
+                return new MsgInfo<UserInfo> { Code = 0, Msg = "无效" };
+            }
+        }
+
+
+        public void Logout(string backurl = "")
+        {
+            var loginID = this.Request.Cookies["logintoken"];
+            ///存储登陆信息 
+            AnalogData.GetAnalogData(AnalogDataEnum.LoginUser).DelData(loginID);
+
+
+
+        }
     }
 }

@@ -1,5 +1,9 @@
- 
-namespace ssotest
+
+using Microsoft.Extensions.Configuration;
+using ssoCommon;
+using System.Runtime.CompilerServices;
+
+namespace ssoCenter
 {
     public class Program
     {
@@ -7,16 +11,24 @@ namespace ssotest
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Services.AddDistributedMemoryCache();
+            builder.Services.AddSession(a => { });
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
-            AnalogData.GetAnalogData("password").SetData("test1", "test1");
-            AnalogData.GetAnalogData("password").SetData("test2", "test2");
-            AnalogData.GetAnalogData("password").SetData("test3", "test3"); 
+            AnalogData.GetAnalogData(AnalogDataEnum.Password).SetData("test1", "test1");
+            AnalogData.GetAnalogData(AnalogDataEnum.Password).SetData("test2", "test2");
+            AnalogData.GetAnalogData(AnalogDataEnum.Password).SetData("test3", "test3");
 
             /////////////·Ö¸îÏß
             var app = builder.Build();
 
+
+            IConfiguration config = app.Services.GetRequiredService<IConfiguration>();
+
+            ConfigOption.DefaultConfig = new ConfigOption();
+
+            config.Bind("ConfigOption", ConfigOption.DefaultConfig);
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
@@ -27,10 +39,24 @@ namespace ssotest
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
+            app.UseSession();
             app.UseRouting();
 
             app.UseAuthorization();
+
+
+            app.Use((context, next) =>
+            {
+                if (string.IsNullOrWhiteSpace(ConfigOption.DefaultConfig.CurrentDomain)
+                    && context.Request.Host.Host.Contains('.'))
+                { 
+                    ConfigOption.DefaultConfig.CurrentDomain = "http://" + context.Request.Host.ToString();
+                }
+
+                return next.Invoke();
+            });
+
+
 
             app.MapControllerRoute(
                 name: "default",
