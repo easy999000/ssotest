@@ -17,7 +17,7 @@ namespace ssoCommon.Api
     public interface IClientApi
     {
         [Get("/Client/logout")]
-        Task<MsgInfo<string>> Logout(string loginID);
+        Task<MsgInfo<string>> Logout(string logintoken);
 
 
 

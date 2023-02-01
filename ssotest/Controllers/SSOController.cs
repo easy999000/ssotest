@@ -13,18 +13,27 @@ namespace ssoCenter.Controllers
             return View();
         }
 
+        /// <summary>
+        /// 严谨来说,用户的cookie令牌,授权跳转登录令牌,本地存储登陆信息的key,应该是各不相同.
+        /// 并且授权跳转令牌时间不宜过长,而且要防止撞库.用过即废
+        /// 这里为了做演示,简单实现
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="password"></param>
+        /// <param name="backurl"></param>
+        /// <returns></returns>
 
         public IActionResult Login(string name, string password, string backurl = "")
         {
             this.ViewData["msg"] = string.Empty;
-            var loginID = this.Request.Cookies["logintoken"];
-            if (!string.IsNullOrWhiteSpace(loginID))
+            var logintoken = this.Request.Cookies["logintoken"];
+            if (!string.IsNullOrWhiteSpace(logintoken))
             {
 
-                var tokenValue = AnalogData.GetAnalogData(AnalogDataEnum.LoginUser).GetData<UserInfo>(loginID);
+                var tokenValue = AnalogData.GetAnalogData(AnalogDataEnum.LoginUser).GetData<UserInfo>(logintoken);
 
                 if (tokenValue != null
-                    && !string.IsNullOrWhiteSpace(tokenValue.LoginMark))
+                    && !string.IsNullOrWhiteSpace(tokenValue.Name))
                 {
                     var b1 = UrlHelper.TryParse(backurl, out UrlHelper urlHelper);
 
@@ -32,7 +41,7 @@ namespace ssoCenter.Controllers
                     {
                         return this.Redirect(this.Request.Scheme + "://" + this.Request.Host.ToString());
                     }
-                    urlHelper.AddQuery("ssotoken", loginID);
+                    urlHelper.AddQuery("logintoken", logintoken);
                     return this.Redirect(urlHelper.GetUrl());
 
                 }
@@ -60,7 +69,7 @@ namespace ssoCenter.Controllers
             ///并且授权跳转令牌时间不宜过长,而且要防止撞库.
             ///这里演示不做太严谨处理.
 
-            loginID = $"loginKey{baseKey}";
+            logintoken = $"logintoken{baseKey}";
             var loginMark = $"{baseKey}|{rand.Next(1000, 9999)}";
 
             UserInfo loginUser = new UserInfo();
@@ -69,7 +78,7 @@ namespace ssoCenter.Controllers
             loginUser.LoginMark = loginMark;
 
             ///存储登陆信息 
-            AnalogData.GetAnalogData(AnalogDataEnum.LoginUser).SetData(loginID, loginUser);
+            AnalogData.GetAnalogData(AnalogDataEnum.LoginUser).SetData(logintoken, loginUser);
 
 
             //设置用户cookie
@@ -81,7 +90,7 @@ namespace ssoCenter.Controllers
 
             }
 
-            this.Response.Cookies.Append("logintoken", loginID, new CookieOptions { Domain = cookieDomain });
+            this.Response.Cookies.Append("logintoken", logintoken, new CookieOptions { Domain = cookieDomain });
 
 
             var b2 = UrlHelper.TryParse(backurl, out UrlHelper urlHelper2);
@@ -90,19 +99,19 @@ namespace ssoCenter.Controllers
             {
                 return this.Redirect(this.Request.Scheme + "://" + this.Request.Host.ToString());
             }
-            urlHelper2.AddQuery("ssotoken", loginID);
+            urlHelper2.AddQuery("logintoken", logintoken);
             return this.Redirect(urlHelper2.GetUrl());
 
 
         }
 
-        public MsgInfo<UserInfo> VerifyToken(string loginID)
+        public MsgInfo<UserInfo> VerifyToken(string logintoken)
         {
 
-            var tokenValue = AnalogData.GetAnalogData(AnalogDataEnum.LoginUser).GetData<UserInfo>(loginID);
+            var tokenValue = AnalogData.GetAnalogData(AnalogDataEnum.LoginUser).GetData<UserInfo>(logintoken);
 
             if (tokenValue != null
-                && !string.IsNullOrWhiteSpace(tokenValue.LoginMark))
+                && !string.IsNullOrWhiteSpace(tokenValue.Name))
             {
                 return new MsgInfo<UserInfo> { Code = 1, Msg = "", Data = tokenValue };
 
@@ -117,9 +126,9 @@ namespace ssoCenter.Controllers
 
         public IActionResult Logout(string backurl = "")
         {
-            var loginID = this.Request.Cookies["logintoken"];
+            var logintoken = this.Request.Cookies["logintoken"];
 
-            AnalogData.GetAnalogData(AnalogDataEnum.LoginUser).DelData(loginID);
+            AnalogData.GetAnalogData(AnalogDataEnum.LoginUser).DelData(logintoken);
 
             foreach (var item in ConfigOption.DefaultConfig.ClientDomain)
             {
@@ -127,7 +136,7 @@ namespace ssoCenter.Controllers
                 {
 
                     var api = new ClientApi(item);
-                    var msg = api.Client.Logout(loginID).Result;
+                    var msg = api.Client.Logout(logintoken).Result;
 
                 }
                 catch (Exception er)
@@ -147,7 +156,7 @@ namespace ssoCenter.Controllers
             {
                 return this.Redirect(this.Request.Scheme + "://" + this.Request.Host.ToString());
             }
-            urlHelper2.AddQuery("ssotoken", loginID);
+            urlHelper2.AddQuery("logintoken", logintoken);
             return this.Redirect(urlHelper2.GetUrl());
 
 

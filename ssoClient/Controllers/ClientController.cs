@@ -12,7 +12,7 @@ namespace ssoClient.Controllers
             return View();
         }
 
-        public IActionResult main()
+        public IActionResult Main()
         {
             string centerUrl = $"{ConfigOption.DefaultConfig.CenterDomain}/sso/login?backurl={Uri.EscapeDataString(ConfigOption.DefaultConfig.CurrentDomain)}/client/verifyLogin";
 
@@ -32,28 +32,28 @@ namespace ssoClient.Controllers
             return View();
         }
 
-        public IActionResult verifyLogin(string ssotoken)
+        public IActionResult VerifyLogin(string logintoken)
         {
             CenterApi api = new CenterApi(ConfigOption.DefaultConfig.CenterDomain);
 
-            var verify = api.Client.VerifyToken(ssotoken).Result;
+            var verify = api.Client.VerifyToken(logintoken).Result;
             if (verify == null || verify.Code == 0)
             {
                 return Content("授权无效");
             }
 
-            this.Response.Cookies.Append("logintoken", ssotoken);
+            this.Response.Cookies.Append("logintoken", logintoken);
             ///存储登陆信息 
-            AnalogData.GetAnalogData(AnalogDataEnum.LoginUser).SetData(ssotoken, verify.Data);
+            AnalogData.GetAnalogData(AnalogDataEnum.LoginUser).SetData(logintoken, verify.Data);
 
 
             return RedirectToAction(this.HttpContext.Session.GetString("actionName"));
 
         }
 
-        public MsgInfo<string> logout(string loginID)
+        public MsgInfo<string> Logout(string logintoken)
         {
-            AnalogData.GetAnalogData(AnalogDataEnum.LoginUser).DelData(loginID);
+            AnalogData.GetAnalogData(AnalogDataEnum.LoginUser).DelData(logintoken);
             return new MsgInfo<string> { Code = 1 };
 
         }

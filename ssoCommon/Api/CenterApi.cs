@@ -17,7 +17,7 @@ namespace ssoCommon.Api
     public interface ICenterApi
     {
         [Get("/sso/VerifyToken")]
-        Task<MsgInfo<UserInfo>> VerifyToken(string loginID);
+        Task<MsgInfo<UserInfo>> VerifyToken(string logintoken);
 
 
 
