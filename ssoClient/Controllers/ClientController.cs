@@ -14,6 +14,9 @@ namespace ssoClient.Controllers
 
         public IActionResult Main()
         {
+            ////这里面部分功能,应该是放在权限中间件里面的,这里为了演示,简单实现
+            ///
+
             string centerUrl = $"{ConfigOption.DefaultConfig.CenterDomain}/sso/login?backurl={Uri.EscapeDataString(ConfigOption.DefaultConfig.CurrentDomain)}/client/verifyLogin";
 
             var loginID = this.Request.Cookies["logintoken"];

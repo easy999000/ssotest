@@ -4,7 +4,7 @@
 }
 
 <div class="text-center">
-    <h3  >
+    <h3>
         当前登入账号:@(AnalogData.GetAnalogData(AnalogDataEnum.LoginUser)
         .GetData<UserInfo>(this.Context.Request.Cookies["logintoken"])?.Name)
     </h3>
@@ -15,10 +15,26 @@
             {
                 <text>
                     <div><a target="_blank" href="@item">@item</a></div>
-                </text> 
+                </text>
             }
-             
+
         }
+
+    </div>
+    <p></p>
+    <div>
+        <p>本示例使用内网临时域名,需要配置本地hosts文件域名才会生效,添加如下配置</p>
+        <pre style="text-align:left">
+                        172.22.130.150 www.ssoCenter.com
+                        172.22.130.150 www.atest.com
+                        172.22.130.150 www.btest.com
+                        172.22.130.150 www.ctest.com
+
+                        172.22.130.150 ssoCenter.com
+                        172.22.130.150 atest.com
+                        172.22.130.150 btest.com
+                        172.22.130.150 ctest.com
+</pre>
 
     </div>
 </div>
