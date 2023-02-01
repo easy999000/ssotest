@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 using ssoCommon;
+using ssoCommon.Api;
 
 namespace ssoCenter.Controllers
 {
@@ -114,11 +115,40 @@ namespace ssoCenter.Controllers
         }
 
 
-        public void Logout(string backurl = "")
+        public IActionResult Logout(string backurl = "")
         {
             var loginID = this.Request.Cookies["logintoken"];
-            ///存储登陆信息 
+
             AnalogData.GetAnalogData(AnalogDataEnum.LoginUser).DelData(loginID);
+
+            foreach (var item in ConfigOption.DefaultConfig.ClientDomain)
+            {
+                try
+                {
+
+                    var api = new ClientApi(item);
+                    var msg = api.Client.Logout(loginID).Result;
+
+                }
+                catch (Exception er)
+                {
+                    Console.WriteLine(er.Message);
+                }
+
+            }
+
+            ///跳转页面
+            /// 
+
+
+            var b2 = UrlHelper.TryParse(backurl, out UrlHelper urlHelper2);
+
+            if (!b2)
+            {
+                return this.Redirect(this.Request.Scheme + "://" + this.Request.Host.ToString());
+            }
+            urlHelper2.AddQuery("ssotoken", loginID);
+            return this.Redirect(urlHelper2.GetUrl());
 
 
 

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ssoCommon.Api
 {
-    public class ClientApi : WebApiClient<ICenterApi>
+    public class ClientApi : WebApiClient<IClientApi>
     {
 
         public ClientApi(string domain) : base(domain)
@@ -17,7 +17,7 @@ namespace ssoCommon.Api
     public interface IClientApi
     {
         [Get("/Client/logout")]
-        Task<MsgInfo<UserInfo>> VerifyToken(string loginID);
+        Task<MsgInfo<string>> Logout(string loginID);
 
 
 

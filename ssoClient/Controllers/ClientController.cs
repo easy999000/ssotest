@@ -51,9 +51,10 @@ namespace ssoClient.Controllers
 
         }
 
-        public void logout(string loginID)
+        public MsgInfo<string> logout(string loginID)
         {
             AnalogData.GetAnalogData(AnalogDataEnum.LoginUser).DelData(loginID);
+            return new MsgInfo<string> { Code = 1 };
 
         }
 
