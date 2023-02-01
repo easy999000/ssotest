@@ -25,6 +25,7 @@ namespace ssoCenter.Controllers
 
         public IActionResult Login(string name, string password, string backurl = "")
         {
+            System.Threading.Thread.Sleep(500);//此处为了演示效果,做个暂停
             this.ViewData["msg"] = string.Empty;
             var logintoken = this.Request.Cookies["logintoken"];
             if (!string.IsNullOrWhiteSpace(logintoken))
@@ -108,6 +109,7 @@ namespace ssoCenter.Controllers
         public MsgInfo<UserInfo> VerifyToken(string logintoken)
         {
 
+            System.Threading.Thread.Sleep(500);//此处为了演示效果,做个暂停
             var tokenValue = AnalogData.GetAnalogData(AnalogDataEnum.LoginUser).GetData<UserInfo>(logintoken);
 
             if (tokenValue != null
@@ -126,6 +128,7 @@ namespace ssoCenter.Controllers
 
         public IActionResult Logout(string backurl = "")
         {
+            System.Threading.Thread.Sleep(500);//此处为了演示效果,做个暂停
             var logintoken = this.Request.Cookies["logintoken"];
 
             AnalogData.GetAnalogData(AnalogDataEnum.LoginUser).DelData(logintoken);

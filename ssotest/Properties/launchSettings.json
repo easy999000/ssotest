@@ -7,7 +7,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "dotnetRunMessages": true,
-      "applicationUrl": "http://ssoCenter.com:5225"
+      "applicationUrl": "http://lssoCenter.com:5225"
     },
     "https": {
       "commandName": "Project",

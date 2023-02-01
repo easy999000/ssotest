@@ -5,8 +5,9 @@
 
 <div class="text-center">
     <h3>
-        当前登入账号:@(AnalogData.GetAnalogData(AnalogDataEnum.LoginUser)
-        .GetData<UserInfo>(this.Context.Request.Cookies["logintoken"])?.Name)
+        当前登入账号:<label style="color:red">@(AnalogData.GetAnalogData(AnalogDataEnum.LoginUser)
+                .GetData<UserInfo>(this.Context.Request.Cookies["logintoken"])?.Name)
+        </label>
     </h3>
     <div>
         客户端站点:
@@ -22,8 +23,9 @@
 
     </div>
     <p></p>
+    <p>示例项目源码地址:<a target="_blank" href="https://github.com/easy999000/ssotest">https://github.com/easy999000/ssotest</a></p>
     <div>
-        <p>本示例使用内网临时域名,需要配置本地hosts文件域名才会生效,添加如下配置</p>
+        <p>本示例使用内网临时域名,需要配置本地hosts文件域名才会生效,hosts添加如下配置</p>
         <pre style="text-align:left">
                         172.22.130.150 www.ssoCenter.com
                         172.22.130.150 www.atest.com
