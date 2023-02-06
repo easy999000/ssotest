@@ -14,7 +14,7 @@ namespace ssoCenter
             builder.Services.AddDistributedMemoryCache();
             builder.Services.AddSession(a => { });
             // Add services to the container.
-            builder.Services.AddControllersWithViews();
+            builder.Services.AddControllersWithViews() .AddRazorRuntimeCompilation();
 
             AnalogData.GetAnalogData(AnalogDataEnum.Password).SetData("test1", "test1");
             AnalogData.GetAnalogData(AnalogDataEnum.Password).SetData("test2", "test2");
@@ -49,7 +49,7 @@ namespace ssoCenter
             {
                 if (string.IsNullOrWhiteSpace(ConfigOption.DefaultConfig.CurrentDomain)
                     && context.Request.Host.Host.Contains('.'))
-                { 
+                {
                     ConfigOption.DefaultConfig.CurrentDomain = "http://" + context.Request.Host.ToString();
                 }
 
