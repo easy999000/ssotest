@@ -5,7 +5,8 @@
 
 <div class="text-center">
     <h3>
-        当前登入账号:<label style="color:red">@(AnalogData.GetAnalogData(AnalogDataEnum.LoginUser)
+        当前登入账号:<label style="color:red">
+            @(AnalogData.GetAnalogData(AnalogDataEnum.LoginUser)
                 .GetData<UserInfo>(this.Context.Request.Cookies["logintoken"])?.Name)
         </label>
     </h3>
@@ -39,4 +40,5 @@
 </pre>
 
     </div>
+    <div>1</div>
 </div>

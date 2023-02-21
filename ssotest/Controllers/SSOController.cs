@@ -13,6 +13,9 @@ namespace ssoCenter.Controllers
             return View();
         }
 
+        #region 对外
+
+
         /// <summary>
         /// 严谨来说,用户的cookie令牌,授权跳转登录令牌,本地存储登陆信息的key,应该是各不相同.
         /// 并且授权跳转令牌时间不宜过长,而且要防止撞库.用过即废
@@ -92,7 +95,7 @@ namespace ssoCenter.Controllers
             }
 
             this.Response.Cookies.Append("logintoken", logintoken, new CookieOptions { Domain = cookieDomain });
-
+              
 
             var b2 = UrlHelper.TryParse(backurl, out UrlHelper urlHelper2);
 
@@ -106,24 +109,6 @@ namespace ssoCenter.Controllers
 
         }
 
-        public MsgInfo<UserInfo> VerifyToken(string logintoken)
-        {
-
-            System.Threading.Thread.Sleep(500);//此处为了演示效果,做个暂停
-            var tokenValue = AnalogData.GetAnalogData(AnalogDataEnum.LoginUser).GetData<UserInfo>(logintoken);
-
-            if (tokenValue != null
-                && !string.IsNullOrWhiteSpace(tokenValue.Name))
-            {
-                return new MsgInfo<UserInfo> { Code = 1, Msg = "", Data = tokenValue };
-
-
-            }
-            else
-            {
-                return new MsgInfo<UserInfo> { Code = 0, Msg = "无效" };
-            }
-        }
 
 
         public IActionResult Logout(string backurl = "")
@@ -165,5 +150,40 @@ namespace ssoCenter.Controllers
 
 
         }
+
+        [Route("/sso/jsonp")]
+        [Route("/sso/jsonp.js")]
+        public string JsonP(string callback, string token)
+        {
+            var logintoken = this.Request.Cookies["logintoken"];
+
+            this.Response.Cookies.Append("test1","tttttt");
+
+            return $"{callback}('{token}')";
+        }
+
+        #endregion
+        #region 对内
+
+
+        public MsgInfo<UserInfo> VerifyToken(string logintoken)
+        {
+
+            System.Threading.Thread.Sleep(500);//此处为了演示效果,做个暂停
+            var tokenValue = AnalogData.GetAnalogData(AnalogDataEnum.LoginUser).GetData<UserInfo>(logintoken);
+
+            if (tokenValue != null
+                && !string.IsNullOrWhiteSpace(tokenValue.Name))
+            {
+                return new MsgInfo<UserInfo> { Code = 1, Msg = "", Data = tokenValue };
+
+
+            }
+            else
+            {
+                return new MsgInfo<UserInfo> { Code = 0, Msg = "无效" };
+            }
+        }
+        #endregion
     }
 }

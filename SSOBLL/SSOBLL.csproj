@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FreeSql" Version="3.2.687" />
+    <PackageReference Include="FreeSql.Extensions.BaseEntity" Version="3.2.687" />
+    <PackageReference Include="FreeSql.Extensions.JsonMap" Version="3.2.687" />
+    <PackageReference Include="FreeSql.Provider.MySqlConnector" Version="3.2.687" />
+    <PackageReference Include="FreeSqlExtend" Version="2.8.3" />
+    <PackageReference Include="StackExchange.Redis" Version="2.6.90" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="DBModel\" />
+    <Folder Include="ApiClient\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -7,7 +7,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "dotnetRunMessages": true,
-      "applicationUrl": "http://lssoCenter.com:5225"
+      "applicationUrl": "http://lssoCenter.com:5220"
     },
     "https": {
       "commandName": "Project",
@@ -16,7 +16,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "dotnetRunMessages": true,
-      "applicationUrl": "https://localhost:7188;http://localhost:5225"
+      "applicationUrl": "https://lssoCenter.com:6220;http://lssoCenter.com:5220"
     },
     "IIS Express": {
       "commandName": "IISExpress",

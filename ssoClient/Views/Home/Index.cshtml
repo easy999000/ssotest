@@ -2,7 +2,66 @@
     ViewData["Title"] = "Home Page";
 }
 
+@section head1{
+    <link rel="prerender" href="https://lssocenter.com:6220/sso/jsonp?callback=show1&token=fff" />
+}
+
+ 
 <div class="text-center">
-   
+
     <h3><a href="/client/main" target="_self">进入会员中心</a></h3>
 </div>
+<div>
+    <p>异步jsonp</p>
+    <button onclick="testJsonp()">异步jsonp</button>
+</div>
+<div>
+    <p>异步core</p>
+    <button onclick="testcore()">异步core</button>
+</div>
+<div>
+    <p>get表单</p>
+    <form method="get" action="https://lssocenter.com:6220/sso/jsonp.js">
+        <input type="hidden" name="callback" value="show1" />
+        <input type="hidden" name="token" value="bbb" />
+        <input type="submit" />
+    </form>
+</div>
+<iframe src="http://lssocenter.com:5220/sso/login?backurl=http%3A%2F%2Flatest.com%3A5221/client/verifyLogin">
+</iframe>
+<script type="text/javascript">
+    function show1(param) {
+         
+        alert("show1: " + param);
+    }
+
+    function testJsonp() {
+        $.get("https://lssocenter.com:6220/sso/jsonp",
+            { callback: "show1", token: "aaaa" },
+            function (data) {
+                alert("testJsonp: " + data);
+            })};
+
+    function testcore() {
+        $.ajax({
+            url: "https://lssocenter.com:6220/sso/jsonp",
+            type: "GET",
+            xhrFields: {
+                withCredentials: true
+            },
+            dataType: "text",
+            data: { callback: "show1", token: "aaaa" },
+            success: function (data) {
+                alert("testcore: " + data);
+            }
+        })
+    };
+    show1('eeeee')
+
+</script>
+
+<script type="text/javascript" src="https://lssocenter.com:6220/sso/jsonp.js?callback=show1&token=bbb">
+
+
+</script>
+
