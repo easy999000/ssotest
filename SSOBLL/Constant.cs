@@ -14,20 +14,33 @@ namespace SSOBLL
         /// <summary>
         /// LoginTokenRedis前缀
         /// </summary>
-        public const string LoginTokenRedisPrefix = "SSO:LoginToken";
+        public const string LoginTokenRedisPrefix = "SSO:LoginToken:";
 
         /// <summary>
         /// JumpTokenRedis前缀
         /// </summary>
-        public const string JumpTokenRedisPrefix = "SSO:JumpToken";
+        public const string JumpTokenRedisPrefix = "SSO:JumpToken:";
         /// <summary>
-        /// WebSiteTokenRedis前缀
+        /// WebSiteAccountToken前缀
         /// </summary>
-        public const string WebSiteTokenRedisPrefix = "SSO:WebSiteToken";
+        public const string WebSiteAccountTokenPrefix = "SSO:WebSiteAccountToken:";
 
         /// <summary>
         /// 秘钥控制器
         /// </summary>
         public const string DataProtectionRedisKey = "SSO:DataProtection-Keys";
+
+        /// <summary>
+        /// 授权站点列表数据缓存
+        /// </summary>
+        public const string WebSiteInfoListCatch = "SSO:WebSiteInfoListCatch";
+        /// <summary>
+        /// sso中心登入cookie名字
+        /// </summary>
+        public const string SSOCenterLoginCookieName = "SSO_SSOCenterLoginCookieName";
+        /// <summary>
+        /// 授权站点列表数据缓存
+        /// </summary>
+        public const string RoleAndWebSiteListCatch = "SSO:RoleAndWebSiteListCatch";
     }
 }

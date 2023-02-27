@@ -31,6 +31,10 @@ namespace SSOWeb.Controllers
             RedisHelperStatic.DBDefault.StringSet("redistest3", DateTime.Now.ToString(),
                 new TimeSpan(0, 10, 0));
 
+            _chche.SetString("redistest4", DateTime.Now.ToString(), new DistributedCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+            }); ;
 
             return Content("ok");
         }
@@ -39,7 +43,7 @@ namespace SSOWeb.Controllers
             var str = _chche.GetString("redistest");
             return Content(str);
         }
-        public IActionResult Protect(string param="a")
+        public IActionResult Protect(string param = "a")
         {
             var str = _protector.Protect(param);
             return Content(str);

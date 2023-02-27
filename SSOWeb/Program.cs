@@ -3,6 +3,7 @@ using FreeSqlExtend;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SSOBLL;
@@ -14,13 +15,6 @@ namespace SSOWeb
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
-            var provider = builder.Services.BuildServiceProvider();
-
-            ///初始化db连接层
-            ///            
-            FreeSqlHelperStatic.InitStaticDB(new SettingHelper(provider.GetService<IConfiguration>()));
-
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
@@ -36,6 +30,10 @@ namespace SSOWeb
 
 
             });
+            //builder.Services.AddDistributedMemoryCache(option => { 
+
+            //});
+
             ///分布式部署,配置秘钥在redis存储
             builder.Services.AddDataProtection()
                 .SetApplicationName("SSOWeb_ApplicationName")
@@ -49,8 +47,7 @@ namespace SSOWeb
                     ValidationAlgorithm = ValidationAlgorithm.HMACSHA256
                 }); ;
 
-            ///配置redis
-            RedisHelperStatic.InitStatic(redisConnStr);
+
 
             ///session配置
             builder.Services.AddSession(options =>
@@ -59,6 +56,24 @@ namespace SSOWeb
             });
 
             var app = builder.Build();
+            Console.WriteLine($"app 已经启动{DateTime.Now.ToString()}");
+
+            ///配置redis
+            RedisHelperStatic.InitStatic(redisConnStr);
+
+            var provider = app.Services;
+
+            ///初始化db连接层
+            ///            
+            FreeSqlHelperStatic.InitStaticDB(new SettingHelper(provider.GetService<IConfiguration>()));
+            FreeSqlHelperStatic.StaticDB.WriteMsg += (a, b) =>
+            {
+                Console.WriteLine(b);
+            };
+
+            //配置缓存帮助类
+            CatchHelper.InitCache(provider.GetService<IDistributedCache>());
+
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())

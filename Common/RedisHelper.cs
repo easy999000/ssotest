@@ -17,7 +17,7 @@ namespace Common
         public RedisHelper(string connStr)
         {
             RedisConnStr = connStr;
-            var DBConn = StackExchange.Redis.ConnectionMultiplexer.Connect(RedisConnStr);
+            DBConn = StackExchange.Redis.ConnectionMultiplexer.Connect(RedisConnStr);
         }
 
         #region GetDatabase
@@ -150,7 +150,7 @@ namespace Common
         #endregion
 
 
-      
+
     }
 
     public class RedisHelperStatic

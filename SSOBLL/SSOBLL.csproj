@@ -11,16 +11,14 @@
     <PackageReference Include="FreeSql.Extensions.BaseEntity" Version="3.2.687" />
     <PackageReference Include="FreeSql.Extensions.JsonMap" Version="3.2.687" />
     <PackageReference Include="FreeSql.Provider.MySqlConnector" Version="3.2.687" />
-    <PackageReference Include="FreeSqlExtend" Version="2.8.3" />
-    <PackageReference Include="StackExchange.Redis" Version="2.6.90" />
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection.Abstractions" Version="7.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="2.2.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+    <PackageReference Include="StackExchange.Redis" Version="2.6.96" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="DBModel\" />
-    <Folder Include="ApiClient\" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <ProjectReference Include="..\..\FreeSqlExtend\FreeSqlExtend\FreeSqlExtend.csproj" />
     <ProjectReference Include="..\Common\Common.csproj" />
   </ItemGroup>
 
