@@ -7,6 +7,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SSOBLL;
+using SSOBLL.ExpiredMonitor;
 
 namespace SSOWeb
 {
@@ -93,6 +94,13 @@ namespace SSOWeb
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
+
+            //WebThreadTest test= new WebThreadTest();
+            //test.Start();
+
+            RedisTokenExpired TokenExpired = new RedisTokenExpired(redisConnStr);
+
+            TokenExpired.Subscribe();
 
             app.Run();
         }

@@ -20,6 +20,15 @@ namespace Common
             DBConn = StackExchange.Redis.ConnectionMultiplexer.Connect(RedisConnStr);
         }
 
+        //public bool test2(int sssssssss1, string ssssssssss2 = "sssssssss", string sssssssssssss3 = "sssssssss", string sssssssss4 = "sssssssss", string sssssssss5 = "sssssssss", string sssssssss6 = "sssssssss", string sssssssss7 = "sssssssss", string ssssssssss8 = "sssssssss" )
+        //{
+        //    return true;
+        //}
+        //public bool test2(RedisKey key, RedisValue value, TimeSpan? expiry = null, bool keepTtl = false, When when = When.Always, CommandFlags flags = CommandFlags.None )
+        //{
+        //    return true;
+        //}
+
         #region GetDatabase
         public IDatabase GetDatabase(int db = -1)
         {
@@ -149,8 +158,7 @@ namespace Common
 
         #endregion
 
-
-
+         
     }
 
     public class RedisHelperStatic
@@ -159,6 +167,10 @@ namespace Common
         public static void InitStatic(string connStr)
         {
             Redis = new RedisHelper(connStr);
+
+            //// DB0.StringSet("",) /// 没有提示
+            //Redis.test2(   ///可以复现bug
+
         }
 
         #region GetDatabase

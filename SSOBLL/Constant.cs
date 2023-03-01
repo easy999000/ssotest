@@ -11,10 +11,16 @@ namespace SSOBLL
     /// </summary>
     public class Constant
     {
+
+        /// <summary>
+        /// Redis超时监控前缀
+        /// </summary>
+        public const string RedisExpiredMonitorPrefix = "SSO:Expired:";
+
         /// <summary>
         /// LoginTokenRedis前缀
         /// </summary>
-        public const string LoginTokenRedisPrefix = "SSO:LoginToken:";
+        public const string LoginTokenRedisPrefix = RedisExpiredMonitorPrefix + "LoginToken:";
 
         /// <summary>
         /// JumpTokenRedis前缀
