@@ -13,49 +13,7 @@ namespace SSOBLL.Login
     public class WebSiteAccountToken : DBModel.WebSiteAccountTokenInfo
     {
         private WebSiteAccountToken() { }
-
-        ///// <summary>
-        ///// 生成logintoken
-        ///// </summary>
-        ///// <returns></returns>
-        //public static WebSiteAccountToken GetOrCreateWebSiteAccountToken(string loginToken, string webSiteSecretKey)
-        //{
-        //    ///查询是否存在
-        //    WebSiteAccountToken res;
-        //    res = SqlHelper.Select<WebSiteAccountTokenInfo>().Where(w => w.LoginToken == loginToken
-        //    && w.WebSiteSecretKey == webSiteSecretKey).ToOne<WebSiteAccountToken>();
-        //    if (res != null)
-        //    {
-        //        return res;
-        //    }
-
-        //    res = new WebSiteAccountToken();
-        //    res.LoginToken = loginToken;
-        //    res.CreateTime = DateTime.Now;
-
-        //    //WebSiteBLL webSiteBll = new WebSiteBLL();
-        //    //var webSite = webSiteBll.GetWebSiteInfoByID(webSiteID);
-        //    res.WebSiteSecretKey = webSiteSecretKey;
-        //    // res.WebSiteAccountToken = RandomHelper.GetString(25);
-
-        //    var b1 = false;
-
-        //    for (int i = 0; i < 20 && !b1; i++)
-        //    {
-        //        ///防止token生成重复,尝试10次, 
-        //        res.WebSiteAccountToken = RandomHelper.GetString(25);
-
-        //        var json = Newtonsoft.Json.JsonConvert.SerializeObject(res);
-
-        //        b1 = RedisHelperStatic.DBDefault.StringSet(
-        //            Constant.WebSiteAccountTokenPrefix + res.WebSiteAccountToken
-        //         , json, TimeSpan.FromHours(5), when: StackExchange.Redis.When.NotExists);
-        //    }
-
-        //    SqlHelper.Insert<WebSiteAccountTokenInfo>(res).ExecuteAffrows();
-
-        //    return res;
-        //}
+         
 
         /// <summary>
         /// 生成logintoken

@@ -15,10 +15,11 @@ namespace SSOBLL.DBModel
     /// 角色和可以登入站点,关联表
     /// </summary> 
     public partial class WebSiteInfoRoleRelation
-    { 
+    {
+        [JsonProperty, Navigate(nameof(RoleID))]
         public virtual SSORole Role { get; set; }
 
-        [Navigate(nameof(WebSiteID))]
+        [JsonProperty,Navigate(nameof(WebSiteID))]
         public virtual WebSiteInfo WebSiteInfo { get; set; }
 
     }

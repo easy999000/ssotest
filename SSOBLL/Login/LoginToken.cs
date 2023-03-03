@@ -1,4 +1,5 @@
 ﻿using Common;
+using Newtonsoft.Json;
 using SSOBLL.DBModel;
 using System;
 using System.Collections.Generic;
@@ -33,6 +34,7 @@ namespace SSOBLL.Login
         /// <summary>
         /// 
         /// </summary>
+        [JsonProperty]
         public List<WebsiteAccountDTO> WebSiteAccountList { get; set; } = new List<WebsiteAccountDTO>();
 
 
@@ -101,6 +103,10 @@ namespace SSOBLL.Login
         /// <returns></returns>
         public static LoginToken GetLoginTokenByTokenFromDB(string loginToken)
         {
+            if (loginToken.StartsWith(Constant.LoginTokenRedisPrefix))
+            {
+                loginToken = loginToken.Substring(Constant.LoginTokenRedisPrefix.Length);
+            }
             var loginTokenModel = SqlHelper.Select<LoginTokenInfo>()
                  .Where(w => w.LoginToken == loginToken)
                  .ToOne<LoginToken>();

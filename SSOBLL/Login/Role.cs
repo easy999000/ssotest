@@ -1,4 +1,5 @@
 ﻿using Common;
+using FreeSql.DataAnnotations;
 using SSOBLL.DBModel;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace SSOBLL.Login
 {
+    [Table(Name = nameof(SSORole), DisableSyncStructure = true)]
     public class Role : SSORole
     {
         public List<WebSiteInfo> RelationWebSiteInfo
@@ -54,10 +56,11 @@ namespace SSOBLL.Login
         /// </summary>
         /// <returns></returns>
         public static List<Role> GetRoleList()
-        {
-            var roleList = SqlHelper.SSOCenter.Select<SSORole>()
+        { 
+
+            var roleList = SqlHelper.SSOCenter.Select<Role>()
                 .IncludeMany(j => j.WebSiteRoleRelation, then => then.Include(b => b.WebSiteInfo))
-                .ToList<Role>();
+                .ToList();
 
             var res = roleList;
 

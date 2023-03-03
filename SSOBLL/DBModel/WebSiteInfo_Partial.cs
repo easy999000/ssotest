@@ -16,7 +16,10 @@ namespace SSOBLL.DBModel
     /// </summary> 
     public partial class WebSiteInfo
     {
-        //[Navigate(nameof(WebSiteInfoRoleRelation.WebSiteID))]
+        /// <summary>
+        /// 
+        /// </summary>
+        [JsonProperty,Navigate(nameof(WebSiteInfoRoleRelation.WebSiteID))]
         public virtual List<WebSiteInfoRoleRelation> WebSiteRoleRelation { get; set; }
 
     }

@@ -66,6 +66,7 @@ namespace SSOBLL.Login
                         WebSiteID = site.ID,
                         WebSiteSecretKey = site.WebSiteSecretKey
                     };
+                    loginToken2.WebSiteAccountList.Add(webAccount);
                     loginToken2.SaveLoginTokenToRedis();
                 }
              
