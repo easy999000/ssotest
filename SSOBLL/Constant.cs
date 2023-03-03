@@ -43,7 +43,7 @@ namespace SSOBLL
         /// <summary>
         /// sso中心登入cookie名字
         /// </summary>
-        public const string SSOCenterLoginCookieName = "SSO_SSOCenterLoginCookieName";
+        public const string SSOCenterLoginCookieName = "SSO_SSOCenterLogin";
         /// <summary>
         /// 授权站点列表数据缓存
         /// </summary>

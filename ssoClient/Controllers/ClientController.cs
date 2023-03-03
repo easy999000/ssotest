@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using ssoClient.Models;
 using ssoCommon;
 using ssoCommon.Api;
 
@@ -61,6 +62,14 @@ namespace ssoClient.Controllers
 
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public ApiMsg Logout([FromBody]WebsiteLogoutParam param)
+        {
+            return new ApiMsg { Code = 1, Data = param.WebSiteAccountToken };
+        }
     }
 }

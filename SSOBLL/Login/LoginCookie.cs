@@ -68,7 +68,7 @@ namespace SSOBLL.Login
             for (int i = 0; i < TokenList.Count; i++)
             {
                 var item = TokenList[i];
-                var user = LoginToken.GetUserInfoByToken(item.LoginToken);
+                var user = LoginToken.GetLoginTokenByToken(item.LoginToken);
                 if (user == null)
                 {
                     TokenList.Remove(item);
@@ -98,7 +98,7 @@ namespace SSOBLL.Login
         {
             foreach (var item in TokenList)
             {
-                var user = LoginToken.GetUserInfoByToken(item.LoginToken);
+                var user = LoginToken.GetLoginTokenByToken(item.LoginToken);
                 if (user != null && user.AllowWebSiteIDs.Contains(webSiteID))
                 {
                     return user;

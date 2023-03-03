@@ -14,63 +14,120 @@ namespace SSOBLL.Login
     {
         private WebSiteAccountToken() { }
 
+        ///// <summary>
+        ///// 生成logintoken
+        ///// </summary>
+        ///// <returns></returns>
+        //public static WebSiteAccountToken GetOrCreateWebSiteAccountToken(string loginToken, string webSiteSecretKey)
+        //{
+        //    ///查询是否存在
+        //    WebSiteAccountToken res;
+        //    res = SqlHelper.Select<WebSiteAccountTokenInfo>().Where(w => w.LoginToken == loginToken
+        //    && w.WebSiteSecretKey == webSiteSecretKey).ToOne<WebSiteAccountToken>();
+        //    if (res != null)
+        //    {
+        //        return res;
+        //    }
+
+        //    res = new WebSiteAccountToken();
+        //    res.LoginToken = loginToken;
+        //    res.CreateTime = DateTime.Now;
+
+        //    //WebSiteBLL webSiteBll = new WebSiteBLL();
+        //    //var webSite = webSiteBll.GetWebSiteInfoByID(webSiteID);
+        //    res.WebSiteSecretKey = webSiteSecretKey;
+        //    // res.WebSiteAccountToken = RandomHelper.GetString(25);
+
+        //    var b1 = false;
+
+        //    for (int i = 0; i < 20 && !b1; i++)
+        //    {
+        //        ///防止token生成重复,尝试10次, 
+        //        res.WebSiteAccountToken = RandomHelper.GetString(25);
+
+        //        var json = Newtonsoft.Json.JsonConvert.SerializeObject(res);
+
+        //        b1 = RedisHelperStatic.DBDefault.StringSet(
+        //            Constant.WebSiteAccountTokenPrefix + res.WebSiteAccountToken
+        //         , json, TimeSpan.FromHours(5), when: StackExchange.Redis.When.NotExists);
+        //    }
+
+        //    SqlHelper.Insert<WebSiteAccountTokenInfo>(res).ExecuteAffrows();
+
+        //    return res;
+        //}
+
         /// <summary>
         /// 生成logintoken
         /// </summary>
         /// <returns></returns>
-        public static WebSiteAccountToken GetOrCreateWebSiteAccountToken(string loginToken, string webSiteSecretKey)
+        public static WebSiteAccountToken MakeWebSiteAccountToken(string loginToken, string webSiteSecretKey)
         {
             ///查询是否存在
-            WebSiteAccountToken res;
-            res = DBHelper.Select<WebSiteAccountTokenInfo>().Where(w => w.LoginToken == loginToken
-            && w.WebSiteSecretKey == webSiteSecretKey).ToOne<WebSiteAccountToken>();
-            if (res != null)
-            {
-                return res;
-            }
+            WebSiteAccountToken res;             
 
             res = new WebSiteAccountToken();
             res.LoginToken = loginToken;
             res.CreateTime = DateTime.Now;
-
-            WebSiteBLL webSiteBll = new WebSiteBLL();
-            //var webSite = webSiteBll.GetWebSiteInfoByID(webSiteID);
-            //res.WebSiteSecretKey = webSite.WebSiteSecretKey;
-            res.WebSiteAccountToken = webSiteSecretKey;
+             
+            res.WebSiteSecretKey = webSiteSecretKey; 
 
             var b1 = false;
 
             for (int i = 0; i < 20 && !b1; i++)
             {
                 ///防止token生成重复,尝试10次, 
-                res.WebSiteAccountToken = RandomHelper.GetString(22);
+                res.WebSiteAccountToken = RandomHelper.GetString(25);
 
                 var json = Newtonsoft.Json.JsonConvert.SerializeObject(res);
 
-                b1 = RedisHelperStatic.DBDefault.StringSet(Constant.WebSiteAccountTokenPrefix + res.WebSiteAccountToken
-                 , json, when: StackExchange.Redis.When.NotExists);
-
+                b1 = RedisHelperStatic.DBDefault.StringSet(
+                    Constant.WebSiteAccountTokenPrefix + res.WebSiteAccountToken
+                 , json, TimeSpan.FromHours(5), when: StackExchange.Redis.When.NotExists);
             }
 
-            DBHelper.Insert<WebSiteAccountTokenInfo>(res).ExecuteAffrows();
+            SqlHelper.Insert<WebSiteAccountTokenInfo>(res).ExecuteAffrows();
 
             return res;
-
         }
 
-        public static bool DelWebsiteTokenByLoginToken(string loginToken)
-        {
-            var websiteTokenList = DBHelper.Select<WebSiteAccountTokenInfo>()
-                  .Where(w => w.LoginToken == loginToken)
-                  .ToList();
+        //public static List<WebSiteAccountToken> ListWebSiteAccountToken(string loginToken)
+        //{
+        //    return SqlHelper.Select<WebSiteAccountTokenInfo>()
+        //          .Where(w => w.LoginToken == loginToken)
+        //          .Include(i => i.WebSite)
+        //          .ToList<WebSiteAccountToken>();
+        //}
 
-            var num = DBHelper.Delete<WebSiteAccountTokenInfo>()
-                .Where(w => w.LoginToken == loginToken)
+        /// <summary>
+        /// 延迟过期
+        /// </summary>
+        /// <param name="loginToken"></param>
+        /// <returns></returns>
+        public static bool DelayedExpire(params string[] websiteAccountTokenList)
+        {
+            foreach (var item in websiteAccountTokenList)
+            {
+                RedisHelperStatic.DBDefault.KeyExpire(Constant.WebSiteAccountTokenPrefix + item
+                   , TimeSpan.FromHours(5));
+            }
+            return true;
+        }
+
+
+        public static bool DelWebsiteAccountToken(string[] websiteAccountTokenList)
+        {
+            //var websiteTokenList = SqlHelper.Select<WebSiteAccountTokenInfo>()
+            //      .Where(w => w.LoginToken == loginToken)
+            //      .ToList();
+
+            var num = SqlHelper.Delete<WebSiteAccountTokenInfo>()
+                .Where(w => websiteAccountTokenList.Contains( w.WebSiteAccountToken))
                 .ExecuteAffrows();
 
-            if (websiteTokenList.Count > 0)
+            if (websiteAccountTokenList.Length > 0)
             {
-                var keys = websiteTokenList.Select(s => (RedisKey)(Constant.WebSiteAccountTokenPrefix + s.WebSiteAccountToken))
+                var keys = websiteAccountTokenList.Select(s => (RedisKey)(Constant.WebSiteAccountTokenPrefix + s))
                     .ToArray();
                 RedisHelperStatic.DBDefault.KeyDelete(keys);
             }

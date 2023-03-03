@@ -2,6 +2,7 @@
 using SSOBLL.ApiClient;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Security.Principal;
 using System.Text;
@@ -40,8 +41,8 @@ namespace SSOBLL.Login
                 return res.SetError(2, "jumpUrl无效");
             }
             ///获取准备登入的站点, 判断跳转站点是否是授权站点
-            WebSiteBLL siteBll = new WebSiteBLL();
-            var site = siteBll.GetWebSiteInfoByHost(jumpUrlHelper.uriBuilder.Host);
+
+            var site = WebSite.GetWebSiteInfoByHost(jumpUrlHelper.uriBuilder.Host);
             if (site == null)
             {
                 return res.SetError(3, "站点未授权");
@@ -53,14 +54,31 @@ namespace SSOBLL.Login
             var loginToken2 = loginCookie.GetCurrentLoginToken(site.ID);
             if (loginToken2 != null)
             {
-                ///用户站点令牌信息
-                WebSiteAccountToken webSiteAccountToken2
-                    = WebSiteAccountToken.GetOrCreateWebSiteAccountToken(loginToken2.LoginToken, site.WebSiteSecretKey);
+                var webAccount = loginToken2.WebSiteAccountList.FirstOrDefault(f => f.WebSiteSecretKey == site.WebSiteSecretKey);
 
+                if (webAccount == null)
+                {
+                    ///用户站点令牌信息
+                    var webSiteAccountToken2 = WebSiteAccountToken.MakeWebSiteAccountToken(loginToken2.LoginToken, site.WebSiteSecretKey);
+                    webAccount = new WebsiteAccountDTO
+                    {
+                        WebSiteAccountToken = webSiteAccountToken2.WebSiteAccountToken,
+                        WebSiteID = site.ID,
+                        WebSiteSecretKey = site.WebSiteSecretKey
+                    };
+                    loginToken2.SaveLoginTokenToRedis();
+                }
+             
                 ///生成跳转令牌
-                JumpToken jumpToken2 = JumpToken.MakeJumpToken(webSiteAccountToken2.WebSiteAccountToken, webSiteAccountToken2.WebSiteSecretKey);
+                JumpToken jumpToken2 = JumpToken.MakeJumpToken(webAccount.WebSiteAccountToken, webAccount.WebSiteSecretKey);
+ 
 
                 LoginToken.DelayedExpire(loginToken2.LoginToken);
+
+                // var webAccountTokenList = WebSiteAccountToken.ListWebSiteAccountToken(loginToken2.LoginToken);
+
+                WebSiteAccountToken.DelayedExpire(loginToken2.WebSiteAccountList.Select(s => s.WebSiteAccountToken).ToArray());
+
                 ///返回用户信息
                 return res.SetSuccess((jumpToken2, loginCookie, site.ViewName));
             }
@@ -98,16 +116,25 @@ namespace SSOBLL.Login
             }
 
             ///生成账号在线登入令牌信息
-            LoginToken loginToken3 = LoginToken.MakeLoginToken(account, role.RoleInfo.ID);
+            LoginToken loginToken3 = LoginToken.MakeLoginToken(account, role.ID);
+
             ///生成站点令牌信息
-            WebSiteAccountToken webSiteAccountToken3 = WebSiteAccountToken.GetOrCreateWebSiteAccountToken(loginToken3.LoginToken, site.WebSiteSecretKey);
+            WebSiteAccountToken webSiteAccountToken3 = WebSiteAccountToken.MakeWebSiteAccountToken(loginToken3.LoginToken, site.WebSiteSecretKey);
+
+            loginToken3.WebSiteAccountList.Add(new WebsiteAccountDTO
+            {
+                WebSiteAccountToken = webSiteAccountToken3.WebSiteAccountToken,
+                WebSiteID = site.ID,
+                WebSiteSecretKey = site.WebSiteSecretKey
+            });
+
+            loginToken3.SaveLoginTokenToRedis();
             ///生成跳转令牌
             JumpToken jumpToken3 = JumpToken.MakeJumpToken(webSiteAccountToken3.WebSiteAccountToken, webSiteAccountToken3.WebSiteSecretKey);
 
             loginCookie.AddLoginToken(loginToken3);
 
             return res.SetSuccess((jumpToken3, loginCookie, site.ViewName));
-
 
         }
 
@@ -137,8 +164,8 @@ namespace SSOBLL.Login
                 return res.SetError(2, "jumpUrl无效");
             }
             ///获取准备登入的站点, 判断跳转站点是否是授权站点
-            WebSiteBLL siteBll = new WebSiteBLL();
-            var site = siteBll.GetWebSiteInfoByHost(jumpUrlHelper.uriBuilder.Host);
+
+            var site = WebSite.GetWebSiteInfoByHost(jumpUrlHelper.uriBuilder.Host);
             if (site == null)
             {
                 return res.SetError(3, "站点未授权");
@@ -152,9 +179,7 @@ namespace SSOBLL.Login
                 ///已登入
                 loginCookie.RemoveToken(loginToken2);
 
-                LoginToken.DelLoginToken(loginToken2.LoginToken);
-
-                WebSiteAccountToken.DelWebsiteTokenByLoginToken(loginToken2.LoginToken);
+                ExitFromServer(loginToken2);
 
                 ///返回用户信息
                 return res.SetSuccess(loginCookie);
@@ -162,5 +187,72 @@ namespace SSOBLL.Login
 
             return res.SetSuccess(loginCookie);
         }
+
+        /// <summary>
+        /// 清除登入状态.
+        /// </summary>
+        /// <param name="loginToken"></param>
+        /// <returns></returns>
+        internal bool ExitFromServer(LoginToken loginToken)
+        {
+            ///会出现并发,先后发等情况, 要加处理条件.
+            ///退出中心状态
+            var isDel = LoginToken.DelLoginToken(loginToken.LoginToken);
+
+            if (!isDel)
+            {
+                return isDel;
+            }
+
+            // var webSiteAccountTokenList = WebSiteAccountToken.ListWebSiteAccountToken(loginToken);
+
+            WebSiteAccountToken.DelWebsiteAccountToken(
+                loginToken.WebSiteAccountList.Select(s => s.WebSiteAccountToken).ToArray());
+
+            //if (webSiteAccountTokenList.Count < 1)
+            //{
+            //    return isDel;
+            //}
+
+            List<Task> tasks = new List<Task>();
+            ///退出登入站点
+            foreach (var item in loginToken.WebSiteAccountList)
+            {
+                var website = WebSite.GetWebSiteInfoByID(item.WebSiteID);
+
+                if (website == null || string.IsNullOrWhiteSpace(website.LogoutApi))
+                {
+                    break;
+                }
+                try
+                {
+                    var t1 = WebSiteClient.LogoutAccountAsync(website.LogoutApi, item.WebSiteAccountToken);
+
+                    tasks.Add(t1);
+
+                }
+                catch (Exception ex)
+                {
+                    Trace.TraceError(ex.Message);
+                }
+            }
+
+            if (tasks.Count > 0)
+            {
+                Task.WhenAll(tasks.ToArray());
+
+                foreach (var item in tasks)
+                {
+                    if (item.Exception != null)
+                    {
+                        Trace.TraceError(item.Exception.Message);
+                    }
+                }
+            }
+
+
+            return isDel;
+        }
+
     }
 }

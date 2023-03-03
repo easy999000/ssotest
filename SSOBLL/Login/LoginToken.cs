@@ -13,7 +13,7 @@ namespace SSOBLL.Login
     {
         private LoginToken() { }
 
-        public List<int> _AllowWebSiteIDs;
+        private List<int> _AllowWebSiteIDs;
         public List<int> AllowWebSiteIDs
         {
             get
@@ -29,6 +29,11 @@ namespace SSOBLL.Login
                 return _AllowWebSiteIDs;
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public List<WebsiteAccountDTO> WebSiteAccountList { get; set; } = new List<WebsiteAccountDTO>();
 
 
         /// <summary>
@@ -56,11 +61,17 @@ namespace SSOBLL.Login
 
             }
 
-            DBHelper.Insert<LoginTokenInfo>(res).ExecuteAffrows();
+            SqlHelper.Insert<LoginTokenInfo>(res).ExecuteAffrows();
 
             return res;
-
         }
+
+        public void SaveLoginTokenToRedis()
+        {
+            RedisHelperStatic.DBDefault.Set(Constant.LoginTokenRedisPrefix + LoginToken
+             , this, TimeSpan.FromHours(2));
+        }
+
 
         /// <summary>
         /// 延迟过期
@@ -70,26 +81,69 @@ namespace SSOBLL.Login
         public static bool DelayedExpire(string loginToken)
         {
             return RedisHelperStatic.DBDefault.KeyExpire(Constant.LoginTokenRedisPrefix + loginToken, TimeSpan.FromHours(2));
-
         }
 
-        public static LoginToken GetUserInfoByToken(string loginToken)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="loginToken"></param>
+        /// <returns></returns>
+        public static LoginToken GetLoginTokenByToken(string loginToken)
         {
             var user = RedisHelperStatic.DBDefault.Get<LoginToken>(Constant.LoginTokenRedisPrefix + loginToken);
             return user;
         }
 
         /// <summary>
+        /// 这个方法仅在,redis已经失效的情况下使用.
+        /// </summary>
+        /// <param name="loginToken"></param>
+        /// <returns></returns>
+        public static LoginToken GetLoginTokenByTokenFromDB(string loginToken)
+        {
+            var loginTokenModel = SqlHelper.Select<LoginTokenInfo>()
+                 .Where(w => w.LoginToken == loginToken)
+                 .ToOne<LoginToken>();
+
+            var webAccountList = SqlHelper.Select<WebSiteAccountTokenInfo>()
+                  .Where(w => w.LoginToken == loginToken)
+                  .Include(w => w.WebSite)
+                  .ToList();
+
+            loginTokenModel.WebSiteAccountList = webAccountList.Select(s => new WebsiteAccountDTO
+            {
+                WebSiteAccountToken = s.WebSiteAccountToken,
+                WebSiteID = s.WebSite.ID,
+                WebSiteSecretKey = s.WebSiteSecretKey
+            }).ToList();
+
+            var user = RedisHelperStatic.DBDefault.Get<LoginToken>(Constant.LoginTokenRedisPrefix + loginToken);
+            return user;
+        }
+
+
+        /// <summary>
         /// 
         /// </summary>
         public static bool DelLoginToken(string loginToken)
         {
-            var res = RedisHelperStatic.DBDefault.KeyDelete(Constant.LoginTokenRedisPrefix + loginToken);
+            var res = true;
+            RedisHelperStatic.DBDefault.KeyDelete(Constant.LoginTokenRedisPrefix + loginToken);
 
-            DBHelper.Delete<LoginTokenInfo>(res).Where(w => w.LoginToken == loginToken).ExecuteAffrows();
-
+            var n1 = SqlHelper.Delete<LoginTokenInfo>(res).Where(w => w.LoginToken == loginToken).ExecuteAffrows();
+            if (n1 > 0)
+            {
+                res = true;
+            }
+            else
+            {
+                res = false;
+            }
             return res;
         }
+
+
+
 
     }
 }

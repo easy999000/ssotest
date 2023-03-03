@@ -7,12 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FreeSql" Version="3.2.687" />
-    <PackageReference Include="FreeSql.Extensions.BaseEntity" Version="3.2.687" />
-    <PackageReference Include="FreeSql.Extensions.JsonMap" Version="3.2.687" />
-    <PackageReference Include="FreeSql.Provider.MySqlConnector" Version="3.2.687" />
+    <PackageReference Include="FreeSql" Version="3.2.690" />
+    <PackageReference Include="FreeSql.Extensions.BaseEntity" Version="3.2.690" />
+    <PackageReference Include="FreeSql.Extensions.JsonMap" Version="3.2.690" />
+    <PackageReference Include="FreeSql.Provider.MySqlConnector" Version="3.2.690" />
     <PackageReference Include="Microsoft.AspNetCore.DataProtection.Abstractions" Version="7.0.3" />
-    <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
     <PackageReference Include="StackExchange.Redis" Version="2.6.96" />
   </ItemGroup>

@@ -8,11 +8,15 @@ using System.Threading.Tasks;
 
 namespace SSOBLL.Login
 {
-    public class Role
+    public class Role : SSORole
     {
-        public SSORole RoleInfo { get; set; }
-        public List<WebSiteInfo> RelationWebSiteInfo { get; set; }
-        = new List<WebSiteInfo>();
+        public List<WebSiteInfo> RelationWebSiteInfo
+        {
+            get
+            {
+                return this.WebSiteRoleRelation.Select(x => x.WebSiteInfo).ToList();
+            }
+        }
 
         public bool CanWebSite(int WebSiteID)
         {
@@ -29,7 +33,7 @@ namespace SSOBLL.Login
             var roleList = GetRoleListCatch();
             foreach (var role in roleList)
             {
-                if (role.RoleInfo.ID == id)
+                if (role.ID == id)
                 {
                     return role;
                 }
@@ -51,16 +55,11 @@ namespace SSOBLL.Login
         /// <returns></returns>
         public static List<Role> GetRoleList()
         {
-            var roleList = DBHelper.SSOCenter.Select<SSORole>()
+            var roleList = SqlHelper.SSOCenter.Select<SSORole>()
                 .IncludeMany(j => j.WebSiteRoleRelation, then => then.Include(b => b.WebSiteInfo))
-                .ToList();
+                .ToList<Role>();
 
-            var res = roleList.Select(s => new Role
-            {
-                RoleInfo = s
-                   ,
-                RelationWebSiteInfo = s.WebSiteRoleRelation.Select(x => x.WebSiteInfo).ToList()
-            }).ToList();
+            var res = roleList;
 
 
             return res;
