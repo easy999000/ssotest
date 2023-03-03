@@ -111,6 +111,11 @@ namespace SSOBLL.Login
                  .Where(w => w.LoginToken == loginToken)
                  .ToOne<LoginToken>();
 
+            if (loginTokenModel == null)
+            {
+                return null;
+            }
+
             var webAccountList = SqlHelper.Select<WebSiteAccountTokenInfo>()
                   .Where(w => w.LoginToken == loginToken)
                   .Include(w => w.WebSite)
@@ -123,8 +128,8 @@ namespace SSOBLL.Login
                 WebSiteSecretKey = s.WebSiteSecretKey
             }).ToList();
 
-            var user = RedisHelperStatic.DBDefault.Get<LoginToken>(Constant.LoginTokenRedisPrefix + loginToken);
-            return user;
+
+            return loginTokenModel;
         }
 
 

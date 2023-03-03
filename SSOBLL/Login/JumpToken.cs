@@ -33,7 +33,7 @@ namespace SSOBLL.Login
                  , json, expiry: TimeSpan.FromMinutes(3), when: StackExchange.Redis.When.NotExists);
 
             }
-            SqlHelper.Insert<JumpTokenInfo>(res).ExecuteAffrows();
+           // SqlHelper.Insert<JumpTokenInfo>(res).ExecuteAffrows();
 
             return res;
         }

@@ -91,6 +91,10 @@ namespace SSOBLL.ExpiredMonitor
             }
 
             var loginToken = LoginToken.GetLoginTokenByTokenFromDB(msg.Key);
+            if (loginToken == null)
+            {
+                return;
+            }
 
             LoginBLL bll=new LoginBLL();
             bll.ExitFromServer(loginToken); 
