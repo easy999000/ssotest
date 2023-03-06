@@ -1,5 +1,7 @@
 ﻿using Common;
+using FreeSql.DataAnnotations;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Newtonsoft.Json;
 using SSOBLL.DBModel;
 using StackExchange.Redis;
 using System;
@@ -10,6 +12,10 @@ using System.Threading.Tasks;
 
 namespace SSOBLL.Login
 {
+    /// <summary>
+    /// 站点用户令牌对照表
+    /// </summary>
+    [JsonObject(MemberSerialization.OptIn), Table(DisableSyncStructure = true,Name =nameof(WebSiteAccountTokenInfo))]
     public class WebSiteAccountToken : DBModel.WebSiteAccountTokenInfo
     {
         private WebSiteAccountToken() { }

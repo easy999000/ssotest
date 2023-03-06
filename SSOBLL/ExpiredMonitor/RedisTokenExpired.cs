@@ -1,4 +1,6 @@
 ﻿using Common;
+using FreeSqlExtend;
+using SSOBLL.DBModel;
 using SSOBLL.Login;
 using System;
 using System.Collections.Generic;
@@ -14,6 +16,7 @@ namespace SSOBLL.ExpiredMonitor
     /// </summary>
     public class RedisTokenExpired
     {
+        private static System.Threading.Timer ScanExpiredLoginTokenTimer;
         private string RedisConnStr;
         public RedisTokenExpired(string redisConnStr)
         {
@@ -32,6 +35,7 @@ namespace SSOBLL.ExpiredMonitor
             //ListenerTh.IsBackground = true;
             //ListenerTh.Start();
             Listener();
+            ScanExpiredLoginToken();
         }
 
         /// <summary>
@@ -103,8 +107,65 @@ namespace SSOBLL.ExpiredMonitor
                 return;
             }
 
-            LoginBLL bll=new LoginBLL();
-            bll.ExitFromServer(loginToken); 
+            LoginBLL bll = new LoginBLL();
+            bll.ExitFromServer(loginToken);
+
+        }
+
+
+        /// <summary>
+        /// 扫描超时的logintoken,  
+        /// 系统重启的时候,超时的token消失会丢失,开机后,需要扫描一下.
+        /// 并且定期几个小时,检查一下
+        /// </summary>
+        public void ScanExpiredLoginToken(object o)
+        {
+            string currentLoginToken = "";
+
+            PageParam pageParam = new PageParam() { Count = 1, PageNumber = 0, PageSize = 100 };
+
+            while (true)
+            {
+                var page = SqlHelper.Select<LoginToken>()
+                     .Where(w => w.LoginToken.GreaterThan(currentLoginToken))
+                     .OrderBy(o => o.LoginToken)
+                     .ToPage(pageParam);
+                if (page.Data.Count < 1)
+                {
+                    break;
+                }
+                currentLoginToken = page.Data.Last().LoginToken;
+                pageParam.Count++;
+
+                LoginBLL bll = new LoginBLL();
+
+                foreach (var item in page.Data)
+                {
+                    try
+                    {
+                        if (!LoginToken.ExistsLoginTokenRedis(item.LoginToken))
+                        {
+                            var loginToken = LoginToken.GetLoginTokenByTokenFromDB(item.LoginToken);
+                            if (loginToken == null)
+                            {
+                                break;
+                            }
+
+                            bll.ExitFromServer(loginToken);
+                        }
+
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.TraceError(ex.Message);
+                    }
+                }
+
+            }
+
+            ScanExpiredLoginTokenTimer = new Timer(ScanExpiredLoginToken, null, 1000 * 60 * 60, 1000 * 60 * 60);
+            
+
 
         }
     }

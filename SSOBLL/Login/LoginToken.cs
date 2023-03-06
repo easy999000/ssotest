@@ -152,8 +152,16 @@ namespace SSOBLL.Login
             }
             return res;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="loginToken"></param>
+        /// <returns></returns>
+        public static bool ExistsLoginTokenRedis(string loginToken)
+        {
+            return RedisHelperStatic.DBDefault.KeyExists(Constant.LoginTokenRedisPrefix + loginToken);
 
-
+        }
 
 
     }
