@@ -64,7 +64,14 @@ namespace SSOBLL.ExpiredMonitor
                    Trace.WriteLine(msgStr);
                    Trace.WriteLine(json);
 
-                   ProcessData(msg);
+                   try
+                   {
+                       ProcessData(msg);
+                   }
+                   catch (Exception ex)
+                   {
+                       Trace.TraceError(ex.StackTrace);
+                   }
                });
 
             //while (true)

@@ -67,8 +67,13 @@ namespace ssoClient.Controllers
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public ApiMsg Logout([FromBody]WebsiteLogoutParam param)
+
+        public ApiMsg Logout2( WebsiteLogoutParam param = null)
         {
+            if (param == null)
+            {
+                return new ApiMsg { Code = 1, Data = "" };
+            }
             return new ApiMsg { Code = 1, Data = param.WebSiteAccountToken };
         }
     }

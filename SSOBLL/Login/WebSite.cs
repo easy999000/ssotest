@@ -28,6 +28,11 @@ namespace SSOBLL.Login
         /// <returns></returns>
         public static WebSiteInfo GetWebSiteInfoByHost(string host)
         {
+            ///latest.com
+            ///l.atest.com
+            ///atest.com
+
+            host="."+host;
             var webList = GetWebSiteInfoList();
             if (webList == null)
             {
@@ -35,7 +40,7 @@ namespace SSOBLL.Login
             }
             foreach (var item in webList)
             {
-                if (host.Contains(item.WebSiteHost, StringComparison.OrdinalIgnoreCase))
+                if (host.Contains("." + item.WebSiteHost, StringComparison.OrdinalIgnoreCase))
                 {
                     return item;
                 }

@@ -69,10 +69,10 @@ namespace SSOBLL.Login
                     loginToken2.WebSiteAccountList.Add(webAccount);
                     loginToken2.SaveLoginTokenToRedis();
                 }
-             
+
                 ///生成跳转令牌
                 JumpToken jumpToken2 = JumpToken.MakeJumpToken(webAccount.WebSiteAccountToken, webAccount.WebSiteSecretKey);
- 
+
 
                 LoginToken.DelayedExpire(loginToken2.LoginToken);
 
@@ -227,7 +227,18 @@ namespace SSOBLL.Login
                 }
                 try
                 {
-                    var t1 = WebSiteClient.LogoutAccountAsync(website.LogoutApi, item.WebSiteAccountToken);
+                    var t1 = WebSiteClient.LogoutAccountAsync(website.LogoutApi, item.WebSiteAccountToken)
+                        .ContinueWith((tres) =>
+                        {
+                            if (tres.Status == TaskStatus.Faulted)
+                            { 
+                                if (tres.Exception != null)
+                                {
+                                    Trace.TraceError(tres.Exception.Message);
+                                }
+                            }
+                             
+                        });
 
                     tasks.Add(t1);
 
@@ -240,15 +251,15 @@ namespace SSOBLL.Login
 
             if (tasks.Count > 0)
             {
-                Task.WhenAll(tasks.ToArray());
+                Task.WhenAll(tasks.ToArray()).Wait();
 
-                foreach (var item in tasks)
-                {
-                    if (item.Exception != null)
-                    {
-                        Trace.TraceError(item.Exception.Message);
-                    }
-                }
+                //foreach (var item in tasks)
+                //{
+                //    if (item.Exception != null)
+                //    {
+                //        Trace.TraceError(item.Exception.Message);
+                //    }
+                //}
             }
 
 

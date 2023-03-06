@@ -32,6 +32,13 @@ namespace SSOBLL.ApiClient
 
             var res = await response.Content.ReadFromJsonAsync<T>();
 
+            //var response = await client.PostAsync(url
+            //    , new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(data)));
+
+            //var json = await response.Content.ReadAsStringAsync();
+
+            //var res = Newtonsoft.Json.JsonConvert.DeserializeObject<T>(json);
+
             return res;
         }
         /// <summary>
@@ -54,7 +61,7 @@ namespace SSOBLL.ApiClient
         /// <returns></returns>
         public static async Task<ApiMsg> RenewalAccountAsync(string url, List<string> webSiteAccountTokenList)
         {
-            RenewalAccountParam param = new RenewalAccountParam() {  WebSiteAccountTokenList = webSiteAccountTokenList };
+            RenewalAccountParam param = new RenewalAccountParam() { WebSiteAccountTokenList = webSiteAccountTokenList };
 
             return await StaticClient.ApiPostAsync<ApiMsg>(url, param);
 
