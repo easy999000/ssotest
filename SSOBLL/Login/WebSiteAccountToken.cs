@@ -1,7 +1,9 @@
 ﻿using Common;
 using FreeSql.DataAnnotations;
+using FreeSqlExtend;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Newtonsoft.Json;
+using SSOBLL.ApiClient;
 using SSOBLL.DBModel;
 using StackExchange.Redis;
 using System;
@@ -15,11 +17,11 @@ namespace SSOBLL.Login
     /// <summary>
     /// 站点用户令牌对照表
     /// </summary>
-    [JsonObject(MemberSerialization.OptIn), Table(DisableSyncStructure = true,Name =nameof(WebSiteAccountTokenInfo))]
+    [JsonObject(MemberSerialization.OptIn), Table(DisableSyncStructure = true, Name = nameof(WebSiteAccountTokenInfo))]
     public class WebSiteAccountToken : DBModel.WebSiteAccountTokenInfo
     {
         private WebSiteAccountToken() { }
-         
+
 
         /// <summary>
         /// 生成logintoken
@@ -28,13 +30,13 @@ namespace SSOBLL.Login
         public static WebSiteAccountToken MakeWebSiteAccountToken(string loginToken, string webSiteSecretKey)
         {
             ///查询是否存在
-            WebSiteAccountToken res;             
+            WebSiteAccountToken res;
 
             res = new WebSiteAccountToken();
             res.LoginToken = loginToken;
             res.CreateTime = DateTime.Now;
-             
-            res.WebSiteSecretKey = webSiteSecretKey; 
+
+            res.WebSiteSecretKey = webSiteSecretKey;
 
             var b1 = false;
 
@@ -45,7 +47,7 @@ namespace SSOBLL.Login
 
                 var json = Newtonsoft.Json.JsonConvert.SerializeObject(res);
 
-                b1 = RedisHelperStatic.DBDefault.StringSet(
+                b1 = RedisHelper.DBDefault.StringSet(
                     Constant.WebSiteAccountTokenPrefix + res.WebSiteAccountToken
                  , json, TimeSpan.FromHours(5), when: StackExchange.Redis.When.NotExists);
             }
@@ -72,7 +74,7 @@ namespace SSOBLL.Login
         {
             foreach (var item in websiteAccountTokenList)
             {
-                RedisHelperStatic.DBDefault.KeyExpire(Constant.WebSiteAccountTokenPrefix + item
+                RedisHelper.DBDefault.KeyExpire(Constant.WebSiteAccountTokenPrefix + item
                    , TimeSpan.FromHours(5));
             }
             return true;
@@ -86,18 +88,56 @@ namespace SSOBLL.Login
             //      .ToList();
 
             var num = SqlHelper.Delete<WebSiteAccountTokenInfo>()
-                .Where(w => websiteAccountTokenList.Contains( w.WebSiteAccountToken))
+                .Where(w => websiteAccountTokenList.Contains(w.WebSiteAccountToken))
                 .ExecuteAffrows();
 
             if (websiteAccountTokenList.Length > 0)
             {
                 var keys = websiteAccountTokenList.Select(s => (RedisKey)(Constant.WebSiteAccountTokenPrefix + s))
                     .ToArray();
-                RedisHelperStatic.DBDefault.KeyDelete(keys);
+                RedisHelper.DBDefault.KeyDelete(keys);
             }
 
             return true;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public static PageResult<WebSiteAccountToken> PageWebSiteAccountTokenBySecretKey(string SecretKey, PageParam pageParam)
+        {
+            var page = SqlHelper.Select<WebSiteAccountToken>()
+                  .Where(w => w.WebSiteSecretKey == SecretKey)
+                  .OrderBy(o => o.WebSiteAccountToken)
+                  .ToPage(pageParam);
+
+            return page;
+        }
+
+        public static ApiMsg RenewalLoginTokenAsync(string url, List<string> websiteAccountTokenList)
+        {
+            try
+            {
+
+                if (websiteAccountTokenList == null || websiteAccountTokenList.Count < 1)
+                {
+                    return ApiMsg.ReturnSuccess();
+                }
+                if (string.IsNullOrWhiteSpace(url))
+                {
+                    return ApiMsg.ReturnSuccess();
+                }
+
+                return WebSiteClient.RenewalAccountAsync(url, websiteAccountTokenList).Result;
+
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.LogError(ex, "RenewalLoginTokenAsync");
+                return ApiMsg.ReturnError(ex.Message);
+            }
+
+        }
     }
 }

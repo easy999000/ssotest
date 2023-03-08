@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Common;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -88,7 +89,7 @@ namespace SSOBLL.ExpiredMonitor
             }
             catch (Exception ex)
             {
-                Trace.TraceError(ex.Message);
+                LoggerHelper.LogError(ex, ex.Message);
                 return false;
             }
         }

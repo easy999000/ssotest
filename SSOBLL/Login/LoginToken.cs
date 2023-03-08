@@ -1,4 +1,5 @@
 ﻿using Common;
+using FreeSql.DataAnnotations;
 using Newtonsoft.Json;
 using SSOBLL.DBModel;
 using System;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace SSOBLL.Login
 {
+    [JsonObject(MemberSerialization.OptIn), Table(DisableSyncStructure = true,Name =nameof(LoginTokenInfo))]
     public class LoginToken : DBModel.LoginTokenInfo
     {
         private LoginToken() { }
@@ -58,7 +60,7 @@ namespace SSOBLL.Login
 
                 // var json = Newtonsoft.Json.JsonConvert.SerializeObject(res);
 
-                b1 = RedisHelperStatic.DBDefault.Set(Constant.LoginTokenRedisPrefix + res.LoginToken
+                b1 = RedisHelper.DBDefault.Set(Constant.LoginTokenRedisPrefix + res.LoginToken
                  , res, TimeSpan.FromHours(2), when: StackExchange.Redis.When.NotExists);
 
             }
@@ -70,7 +72,7 @@ namespace SSOBLL.Login
 
         public void SaveLoginTokenToRedis()
         {
-            RedisHelperStatic.DBDefault.Set(Constant.LoginTokenRedisPrefix + LoginToken
+            RedisHelper.DBDefault.Set(Constant.LoginTokenRedisPrefix + LoginToken
              , this, TimeSpan.FromHours(2));
         }
 
@@ -82,7 +84,7 @@ namespace SSOBLL.Login
         /// <returns></returns>
         public static bool DelayedExpire(string loginToken)
         {
-            return RedisHelperStatic.DBDefault.KeyExpire(Constant.LoginTokenRedisPrefix + loginToken, TimeSpan.FromHours(2));
+            return RedisHelper.DBDefault.KeyExpire(Constant.LoginTokenRedisPrefix + loginToken, TimeSpan.FromHours(2));
         }
 
         /// <summary>
@@ -92,7 +94,7 @@ namespace SSOBLL.Login
         /// <returns></returns>
         public static LoginToken GetLoginTokenByToken(string loginToken)
         {
-            var user = RedisHelperStatic.DBDefault.Get<LoginToken>(Constant.LoginTokenRedisPrefix + loginToken);
+            var user = RedisHelper.DBDefault.Get<LoginToken>(Constant.LoginTokenRedisPrefix + loginToken);
             return user;
         }
 
@@ -139,7 +141,7 @@ namespace SSOBLL.Login
         public static bool DelLoginToken(string loginToken)
         {
             var res = true;
-            RedisHelperStatic.DBDefault.KeyDelete(Constant.LoginTokenRedisPrefix + loginToken);
+            RedisHelper.DBDefault.KeyDelete(Constant.LoginTokenRedisPrefix + loginToken);
 
             var n1 = SqlHelper.Delete<LoginTokenInfo>(res).Where(w => w.LoginToken == loginToken).ExecuteAffrows();
             if (n1 > 0)
@@ -159,7 +161,7 @@ namespace SSOBLL.Login
         /// <returns></returns>
         public static bool ExistsLoginTokenRedis(string loginToken)
         {
-            return RedisHelperStatic.DBDefault.KeyExists(Constant.LoginTokenRedisPrefix + loginToken);
+            return RedisHelper.DBDefault.KeyExists(Constant.LoginTokenRedisPrefix + loginToken);
 
         }
 

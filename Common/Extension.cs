@@ -23,6 +23,10 @@ public static class Extension
         var json = cache.GetString(key);
         try
         {
+            if (string.IsNullOrWhiteSpace(json))
+            {
+                return null;
+            }
             var res = Newtonsoft.Json.JsonConvert.DeserializeObject<T>(json);
             return res;
         }
@@ -46,6 +50,10 @@ public static class Extension
         string json = redis.StringGet(key);
         try
         {
+            if (string.IsNullOrWhiteSpace(json))
+            {
+                return null;
+            }
             var res = Newtonsoft.Json.JsonConvert.DeserializeObject<T>(json);
             return res;
         }

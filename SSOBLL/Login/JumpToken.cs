@@ -29,7 +29,7 @@ namespace SSOBLL.Login
 
                 var json = Newtonsoft.Json.JsonConvert.SerializeObject(res);
 
-                b1 = RedisHelperStatic.DBDefault.StringSet(Constant.JumpTokenRedisPrefix + res.JumpToken
+                b1 = RedisHelper.DBDefault.StringSet(Constant.JumpTokenRedisPrefix + res.JumpToken
                  , json, expiry: TimeSpan.FromMinutes(3), when: StackExchange.Redis.When.NotExists);
 
             }

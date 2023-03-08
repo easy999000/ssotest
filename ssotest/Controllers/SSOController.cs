@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http.Extensions;
+﻿using Common;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 using ssoCommon;
@@ -127,9 +128,10 @@ namespace ssoCenter.Controllers
                     var msg = api.Client.Logout(logintoken).Result;
 
                 }
-                catch (Exception er)
+                catch (Exception ex)
                 {
-                    Console.WriteLine(er.Message);
+                    LoggerHelper.LogError(ex, ex.Message);
+                     
                 }
 
             }

@@ -107,10 +107,10 @@ namespace SSOBLL.ApiClient
         public ApiMsg<T> SetSuccess(T data)
         {
             this.Code = 1;
-            this.Data= data;
+            this.Data = data;
             return this;
         }
- 
+
         /// <summary>
         /// 
         /// </summary>
@@ -125,7 +125,7 @@ namespace SSOBLL.ApiClient
         /// 
         /// </summary>
         /// <returns></returns>
-        public ApiMsg<T> SetError(int code,string message)
+        public ApiMsg<T> SetError(int code, string message)
         {
             this.Code = code;
             this.Msg = message;
@@ -146,7 +146,7 @@ namespace SSOBLL.ApiClient
         /// 
         /// </summary>
         /// <returns></returns>
-        public ApiMsg<T> SetError(int code,string message, T data)
+        public ApiMsg<T> SetError(int code, string message, T data)
         {
             this.Code = code;
             this.Msg = message;
@@ -156,5 +156,128 @@ namespace SSOBLL.ApiClient
     }
     public class ApiMsg : ApiMsg<object>
     {
+        public ApiMsg() { }
+
+        public ApiMsg(int code) : base(code)
+        {
+        }
+        public ApiMsg(int code, string msg) : base(code, msg)
+        {
+        }
+        public ApiMsg(int code, string msg, object data) : base(code, msg, data)
+        {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public static ApiMsg ReturnSuccess()
+        {
+            return new ApiMsg(1);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public static ApiMsg ReturnSuccess(object data)
+        {
+            return new ApiMsg(1, "", data);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public static ApiMsg ReturnError(string message)
+        {
+            return new ApiMsg(0, message);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public static ApiMsg ReturnError(int code, string message)
+        {
+            return new ApiMsg(code, message);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public static ApiMsg ReturnError(string message, object data)
+        {
+            return new ApiMsg(0, message, data);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public static ApiMsg ReturnError(int code, string message, object data)
+        {
+            return new ApiMsg(code, message, data);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public ApiMsg SetSuccess()
+        {
+            this.Code = 1;
+            return this;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public ApiMsg SetSuccess(object data)
+        {
+            this.Code = 1;
+            this.Data = data;
+            return this;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public ApiMsg SetError(string message)
+        {
+            this.Code = 0;
+            this.Msg = message;
+            return this;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public ApiMsg SetError(int code, string message)
+        {
+            this.Code = code;
+            this.Msg = message;
+            return this;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public ApiMsg SetError(string message, object data)
+        {
+            this.Code = 0;
+            this.Msg = message;
+            this.Data = data;
+            return this;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public ApiMsg SetError(int code, string message, object data)
+        {
+            this.Code = code;
+            this.Msg = message;
+            this.Data = data;
+            return this;
+        }
     }
 }

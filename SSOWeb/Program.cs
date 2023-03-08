@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SSOBLL;
 using SSOBLL.ExpiredMonitor;
+using System.Diagnostics;
 
 namespace SSOWeb
 {
@@ -16,6 +17,7 @@ namespace SSOWeb
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+ 
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
@@ -56,20 +58,31 @@ namespace SSOWeb
 
             });
 
-            var app = builder.Build();
-            Console.WriteLine($"app 已经启动{DateTime.Now.ToString()}");
-
-            ///配置redis
-            RedisHelperStatic.InitStatic(redisConnStr);
+            var app = builder.Build(); 
 
             var provider = app.Services;
+            LoggerHelper.Init(provider.GetService<ILogger<LoggerHelper>>());
+            LoggerHelper.LogInformation($"app 已经启动{DateTime.Now.ToString()}");
+            ///配置redis
+            RedisHelper.InitStatic(redisConnStr);
+
 
             ///初始化db连接层
             ///            
             FreeSqlHelperStatic.InitStaticDB(new SettingHelper(provider.GetService<IConfiguration>()));
             FreeSqlHelperStatic.StaticDB.WriteMsg += (a, b) =>
             {
-                Console.WriteLine(b);
+                switch (a)
+                {
+                    case MsgType.Info:
+                        LoggerHelper.LogInformation(b);
+                        break;
+                    case MsgType.Error:
+                        LoggerHelper.LogError(b);
+                        break;
+                    default:
+                        break;
+                } 
             };
 
             //配置缓存帮助类
@@ -83,8 +96,10 @@ namespace SSOWeb
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+            //ILogger<string> l;
+            //l.LogError()
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();

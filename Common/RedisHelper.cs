@@ -8,7 +8,7 @@ namespace Common
     /// <summary>
     /// 
     /// </summary>
-    public class RedisHelper
+    public class RedisHelper<T>
     {
 
 
@@ -158,15 +158,15 @@ namespace Common
 
         #endregion
 
-         
+
     }
 
-    public class RedisHelperStatic
+    public static class RedisHelper
     {
-        public static RedisHelper Redis;
+        public static RedisHelper<string> Redis;
         public static void InitStatic(string connStr)
         {
-            Redis = new RedisHelper(connStr);
+            Redis = new RedisHelper<string>(connStr);
 
             //// DB0.StringSet("",) /// 没有提示
             //Redis.test2(   ///可以复现bug

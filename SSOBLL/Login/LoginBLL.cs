@@ -1,4 +1,5 @@
 ﻿using Common;
+using Microsoft.IdentityModel.Logging;
 using SSOBLL.ApiClient;
 using System;
 using System.Collections.Generic;
@@ -32,6 +33,8 @@ namespace SSOBLL.Login
         {
             var res = ApiMsg<(JumpToken jumpToken, LoginCookie loginCookie, string ViewName)>
                 .ReturnError("未知错误");
+
+            LoggerHelper.LogTrace("登入CheckLoginStatus");
 
             UrlHelper jumpUrlHelper;
             ///检测回跳地址,是否合规
@@ -234,7 +237,8 @@ namespace SSOBLL.Login
                             { 
                                 if (tres.Exception != null)
                                 {
-                                    Trace.TraceError(tres.Exception.Message);
+                                    LoggerHelper.LogError(tres.Exception, tres.Exception.Message);
+                                     
                                 }
                             }
                              
@@ -245,7 +249,8 @@ namespace SSOBLL.Login
                 }
                 catch (Exception ex)
                 {
-                    Trace.TraceError(ex.Message);
+                    LoggerHelper.LogError(ex, ex.Message);
+                     
                 }
             }
 

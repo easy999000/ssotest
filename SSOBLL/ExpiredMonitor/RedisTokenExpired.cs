@@ -16,7 +16,15 @@ namespace SSOBLL.ExpiredMonitor
     /// </summary>
     public class RedisTokenExpired
     {
+        /// <summary>
+        /// 超时扫描,定时器
+        /// </summary>
         private static System.Threading.Timer ScanExpiredLoginTokenTimer;
+        /// <summary>
+        /// 在线扫描定时器
+        /// </summary>
+        private static System.Threading.Timer ScanRenewalLoginTokenTimer;
+
         private string RedisConnStr;
         public RedisTokenExpired(string redisConnStr)
         {
@@ -34,8 +42,20 @@ namespace SSOBLL.ExpiredMonitor
             //ListenerTh = new Thread(Listener);
             //ListenerTh.IsBackground = true;
             //ListenerTh.Start();
-            Listener();
-            ScanExpiredLoginToken();
+#if !DEBUG 
+            RedisHelper.DBDefault.StringSet("SSO:WebThreadTestStart", DateTime.Now.ToString());
+#endif
+            try
+            {
+                Listener();
+            }
+            catch (Exception ex)
+            {
+                LoggerHelper.LogError(ex, "Subscribe");
+            }
+
+            ScanExpiredLoginToken(null);
+            ScanRenewalLoginToken(null);
         }
 
         /// <summary>
@@ -44,37 +64,45 @@ namespace SSOBLL.ExpiredMonitor
         /// <param name="token"></param>
         private void Listener()
         {
+
             //__keyspace@0__:SSO:WebSiteAccountToken:COxDgE6YG02RxnswDl3I6G:expired
             //__keyspace@0__:SSO:WebSiteAccountToken:COxDgE6YG02RxnswDl3I6G:del
-            // 暂时只监控这2种命令
-            RedisHelper redis = new RedisHelper(RedisConnStr);
-            //var queue = redis.DBConn.GetSubscriber().Subscribe($"__keyspace@*__:SSO:*");
-            Trace.WriteLine($"redis订阅启动");
-            redis.DBConn.GetSubscriber().Subscribe(
-               $"__keyspace@*__:{Constant.RedisExpiredMonitorPrefix}*"
-               // $"*"
+            // 暂时只监控这2种命令 
+            LoggerHelper.LogTrace($"redis订阅启动");
+
+            RedisHelper.Redis.DBConn.GetSubscriber().Subscribe(
+                 $"__keyspace@*__:{Constant.RedisExpiredMonitorPrefix}*"
+               //$"*"
                , (channel, message) =>
                {
-                   var msgStr = channel + ":" + message;
-
-                   if (!RedisSubMsg.TryParse(msgStr, out var msg))
-                   {
-                       Trace.WriteLine(msgStr);
-                       return;
-                   }
-
-                   var json = Newtonsoft.Json.JsonConvert.SerializeObject(msg);
-                   Trace.WriteLine($"====收到消息====");
-                   Trace.WriteLine(msgStr);
-                   Trace.WriteLine(json);
-
                    try
                    {
-                       ProcessData(msg);
+                       var msgStr = channel + ":" + message;
+                       LoggerHelper.LogTrace($"====收到消息====");
+                       LoggerHelper.LogTrace(msgStr);
+
+                       if (!RedisSubMsg.TryParse(msgStr, out var msg))
+                       {
+                           LoggerHelper.LogTrace(msgStr);
+                           return;
+                       }
+
+                       var json = Newtonsoft.Json.JsonConvert.SerializeObject(msg);
+                       LoggerHelper.LogTrace(json);
+
+                       try
+                       {
+                           ProcessData(msg);
+                       }
+                       catch (Exception ex)
+                       {
+                           LoggerHelper.LogError(ex, ex.Message);
+                       }
+
                    }
-                   catch (Exception ex)
+                   catch (Exception ex2)
                    {
-                       Trace.TraceError(ex.StackTrace);
+                       LoggerHelper.LogError(ex2, "GetSubscriber().Subscribe");
                    }
                });
 
@@ -85,8 +113,8 @@ namespace SSOBLL.ExpiredMonitor
             //    string log = "";
             //    log += $"msg.Message:{msg.Message},";
             //    log += $"msg.Message:{msg.Channel.ToString()},";
-            //    Trace.WriteLine($"====收到消息====");
-            //    Trace.WriteLine(msg);
+            //    LoggerHelper.LogTrace($"====收到消息====");
+            //    LoggerHelper.LogTrace(msg);
             //});
 
             //} 
@@ -135,7 +163,7 @@ namespace SSOBLL.ExpiredMonitor
                     break;
                 }
                 currentLoginToken = page.Data.Last().LoginToken;
-                pageParam.Count++;
+                pageParam.PageNumber++;
 
                 LoginBLL bll = new LoginBLL();
 
@@ -157,16 +185,104 @@ namespace SSOBLL.ExpiredMonitor
                     }
                     catch (Exception ex)
                     {
-                        Trace.TraceError(ex.Message);
+                        LoggerHelper.LogError(ex, ex.Message);
+
                     }
                 }
 
             }
 
-            ScanExpiredLoginTokenTimer = new Timer(ScanExpiredLoginToken, null, 1000 * 60 * 60, 1000 * 60 * 60);
-            
+
+            if (ScanExpiredLoginTokenTimer == null)
+            {
+                ScanExpiredLoginTokenTimer = new Timer(ScanExpiredLoginToken, null, 1000 * 60 * 60, 1000 * 60 * 60);
+
+            }
+
+#if !DEBUG
+            RedisHelper.DBDefault.StringSet("SSO:ScanExpiredLoginTokenTimer", DateTime.Now.ToString());
+#endif
 
 
         }
+
+        /// <summary>
+        /// 扫描当前在线的账号信息.  并通知应用站点
+        /// </summary>
+        public void ScanRenewalLoginToken(object o)
+        {
+
+            ///考虑到多个站点并发,这块要做锁
+            var rlock = RedisHelper.DBDefault.StringSet(Constant.RenewalLoginTokenLock, DateTime.Now.ToString()
+                  , expiry: TimeSpan.FromMinutes(10)
+                  , when: StackExchange.Redis.When.NotExists);
+            if (rlock)
+            {
+                var webSiteList = WebSite.GetWebSiteInfoList();
+
+                foreach (var webSite in webSiteList)
+                {
+                    string currentLoginToken = "";
+
+                    PageParam pageParam = new PageParam() { Count = 1, PageNumber = 0, PageSize = 50 };
+                    if (string.IsNullOrWhiteSpace(webSite.RenewalApi))
+                    {
+                        break;
+                    }
+                    int errorCount = 0;
+                    while (true)
+                    {
+                        try
+                        {
+
+                            var page = WebSiteAccountToken.PageWebSiteAccountTokenBySecretKey(currentLoginToken, pageParam);
+                            if (page.Data.Count < 1)
+                            {
+                                break;
+                            }
+
+                            currentLoginToken = page.Data.Last().LoginToken;
+                            pageParam.PageNumber++;
+
+                            WebSiteAccountToken.RenewalLoginTokenAsync(webSite.RenewalApi
+                                , page.Data.Select(s => s.WebSiteAccountToken).ToList());
+
+
+                        }
+                        catch (Exception ex)
+                        {
+                            errorCount++;
+                            if (errorCount > 2)
+                            {
+                                break;
+                            }
+                            LoggerHelper.LogError(ex, "ScanRenewalLoginToken");
+
+                        }
+                    }
+                }
+                ///取消锁
+                RedisHelper.DBDefault.KeyDelete(Constant.RenewalLoginTokenLock);
+
+            }
+
+
+            if (ScanRenewalLoginTokenTimer == null)
+            {
+                ///20分钟
+                ScanRenewalLoginTokenTimer = new Timer(ScanExpiredLoginToken, null, 1000 * 60 * 20, 1000 * 60 * 20);
+
+            }
+
+#if !DEBUG
+            RedisHelper.DBDefault.StringSet("SSO:ScanRenewalLoginTokenTimer", DateTime.Now.ToString());
+#endif
+
+
+        }
+
+
+
+
     }
 }

@@ -28,7 +28,7 @@ namespace SSOWeb.Controllers
         public IActionResult set()
         {
 
-            RedisHelperStatic.DBDefault.StringSet("redistest3", DateTime.Now.ToString(),
+            RedisHelper.DBDefault.StringSet("redistest3", DateTime.Now.ToString(),
                 new TimeSpan(0, 10, 0));
 
             _chche.SetString("redistest4", DateTime.Now.ToString(), new DistributedCacheEntryOptions

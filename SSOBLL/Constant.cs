@@ -48,5 +48,9 @@ namespace SSOBLL
         /// 授权站点列表数据缓存
         /// </summary>
         public const string RoleAndWebSiteListCatch = "SSO:RoleAndWebSiteListCatch";
+        /// <summary>
+        /// 
+        /// </summary>
+        public const string RenewalLoginTokenLock = "SSO:RenewalLoginTokenLock";
     }
 }
