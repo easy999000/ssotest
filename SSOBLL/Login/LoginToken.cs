@@ -127,7 +127,7 @@ namespace SSOBLL.Login
             {
                 WebSiteAccountToken = s.WebSiteAccountToken,
                 WebSiteID = s.WebSite.ID,
-                WebSiteSecretKey = s.WebSiteSecretKey
+                WebSiteMark = s.WebSiteMark
             }).ToList();
 
 

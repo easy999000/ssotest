@@ -28,10 +28,10 @@ namespace SSOBLL.DBModel {
 		public string LoginToken { get; set; }
 
 		/// <summary>
-		/// 站点通信令牌
+		/// 站点标识
 		/// </summary>
-		[JsonProperty, Column(StringLength = 45, IsNullable = false)]
-		public string WebSiteSecretKey { get; set; }
+		[JsonProperty, Column(StringLength = 60, IsNullable = false)]
+		public string WebSiteMark { get; set; }
 
 	}
 

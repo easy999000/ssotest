@@ -71,7 +71,7 @@ namespace SSOBLL.Login
         public static List<WebSite> ListWebSiteBySecretKey(List<string> secretKeys)
         {
             return SqlHelper.Select<WebSiteInfo>()
-                  .Where(w => secretKeys.Contains(w.WebSiteSecretKey))
+                  .Where(w => secretKeys.Contains(w.WebSiteMark))
                   .ToList<WebSite>();
         }
     }

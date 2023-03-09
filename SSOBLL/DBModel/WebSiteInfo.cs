@@ -42,14 +42,14 @@ namespace SSOBLL.DBModel {
 		[JsonProperty, Column(StringLength = 100, IsNullable = false)]
 		public string WebSiteHost { get; set; }
 
-		[JsonProperty, Column(StringLength = 45, IsNullable = false)]
-		public string WebSiteName { get; set; }
-
 		/// <summary>
-		/// 站点秘钥
+		/// 站点标识
 		/// </summary>
 		[JsonProperty, Column(StringLength = 60, IsNullable = false)]
-		public string WebSiteSecretKey { get; set; }
+		public string WebSiteMark { get; set; }
+
+		[JsonProperty, Column(StringLength = 45, IsNullable = false)]
+		public string WebSiteName { get; set; }
 
 	}
 

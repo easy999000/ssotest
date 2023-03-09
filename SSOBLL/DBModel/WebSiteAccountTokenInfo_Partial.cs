@@ -15,7 +15,7 @@ namespace SSOBLL.DBModel {
 	public partial class WebSiteAccountTokenInfo {
 
 
-		[JsonProperty,Navigate(nameof(WebSiteInfo.WebSiteSecretKey), TempPrimary = nameof(WebSiteSecretKey))]
+		[JsonProperty,Navigate(nameof(WebSiteInfo.WebSiteMark), TempPrimary = nameof(WebSiteMark))]
 		public virtual WebSiteInfo WebSite { get; set; }
 	}
 

@@ -48,14 +48,14 @@ namespace SSOBLL.ExpiredMonitor
             try
             {
                 Listener();
+
+                ScanExpiredLoginToken(null);
+                ScanRenewalLoginToken(null);
             }
             catch (Exception ex)
             {
                 LoggerHelper.LogError(ex, "Subscribe");
             }
-
-            ScanExpiredLoginToken(null);
-            ScanRenewalLoginToken(null);
         }
 
         /// <summary>

@@ -15,7 +15,7 @@ namespace SSOBLL.Login
         /// <summary>
         /// 
         /// </summary>
-        public string WebSiteSecretKey { get; set; }
+        public string WebSiteMark { get; set; }
         /// <summary>
         /// 
         /// </summary>

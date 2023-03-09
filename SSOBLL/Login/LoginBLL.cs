@@ -57,24 +57,24 @@ namespace SSOBLL.Login
             var loginToken2 = loginCookie.GetCurrentLoginToken(site.ID);
             if (loginToken2 != null)
             {
-                var webAccount = loginToken2.WebSiteAccountList.FirstOrDefault(f => f.WebSiteSecretKey == site.WebSiteSecretKey);
+                var webAccount = loginToken2.WebSiteAccountList.FirstOrDefault(f => f.WebSiteMark == site.WebSiteMark);
 
                 if (webAccount == null)
                 {
                     ///用户站点令牌信息
-                    var webSiteAccountToken2 = WebSiteAccountToken.MakeWebSiteAccountToken(loginToken2.LoginToken, site.WebSiteSecretKey);
+                    var webSiteAccountToken2 = WebSiteAccountToken.MakeWebSiteAccountToken(loginToken2.LoginToken, site.WebSiteMark);
                     webAccount = new WebsiteAccountDTO
                     {
                         WebSiteAccountToken = webSiteAccountToken2.WebSiteAccountToken,
                         WebSiteID = site.ID,
-                        WebSiteSecretKey = site.WebSiteSecretKey
+                        WebSiteMark = site.WebSiteMark
                     };
                     loginToken2.WebSiteAccountList.Add(webAccount);
                     loginToken2.SaveLoginTokenToRedis();
                 }
 
                 ///生成跳转令牌
-                JumpToken jumpToken2 = JumpToken.MakeJumpToken(webAccount.WebSiteAccountToken, webAccount.WebSiteSecretKey);
+                JumpToken jumpToken2 = JumpToken.MakeJumpToken(webAccount.WebSiteAccountToken, webAccount.WebSiteMark);
 
 
                 LoginToken.DelayedExpire(loginToken2.LoginToken);
@@ -123,18 +123,18 @@ namespace SSOBLL.Login
             LoginToken loginToken3 = LoginToken.MakeLoginToken(account, role.ID);
 
             ///生成站点令牌信息
-            WebSiteAccountToken webSiteAccountToken3 = WebSiteAccountToken.MakeWebSiteAccountToken(loginToken3.LoginToken, site.WebSiteSecretKey);
+            WebSiteAccountToken webSiteAccountToken3 = WebSiteAccountToken.MakeWebSiteAccountToken(loginToken3.LoginToken, site.WebSiteMark);
 
             loginToken3.WebSiteAccountList.Add(new WebsiteAccountDTO
             {
                 WebSiteAccountToken = webSiteAccountToken3.WebSiteAccountToken,
                 WebSiteID = site.ID,
-                WebSiteSecretKey = site.WebSiteSecretKey
+                WebSiteMark = site.WebSiteMark
             });
 
             loginToken3.SaveLoginTokenToRedis();
             ///生成跳转令牌
-            JumpToken jumpToken3 = JumpToken.MakeJumpToken(webSiteAccountToken3.WebSiteAccountToken, webSiteAccountToken3.WebSiteSecretKey);
+            JumpToken jumpToken3 = JumpToken.MakeJumpToken(webSiteAccountToken3.WebSiteAccountToken, webSiteAccountToken3.WebSiteMark);
 
             loginCookie.AddLoginToken(loginToken3);
 

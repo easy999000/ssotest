@@ -27,7 +27,7 @@ namespace SSOBLL.Login
         /// 生成logintoken
         /// </summary>
         /// <returns></returns>
-        public static WebSiteAccountToken MakeWebSiteAccountToken(string loginToken, string webSiteSecretKey)
+        public static WebSiteAccountToken MakeWebSiteAccountToken(string loginToken, string webSiteMark)
         {
             ///查询是否存在
             WebSiteAccountToken res;
@@ -36,7 +36,7 @@ namespace SSOBLL.Login
             res.LoginToken = loginToken;
             res.CreateTime = DateTime.Now;
 
-            res.WebSiteSecretKey = webSiteSecretKey;
+            res.WebSiteMark = webSiteMark;
 
             var b1 = false;
 
@@ -105,10 +105,10 @@ namespace SSOBLL.Login
         /// 
         /// </summary>
         /// <returns></returns>
-        public static PageResult<WebSiteAccountToken> PageWebSiteAccountTokenBySecretKey(string SecretKey, PageParam pageParam)
+        public static PageResult<WebSiteAccountToken> PageWebSiteAccountTokenBySecretKey(string webSiteMark, PageParam pageParam)
         {
             var page = SqlHelper.Select<WebSiteAccountToken>()
-                  .Where(w => w.WebSiteSecretKey == SecretKey)
+                  .Where(w => w.WebSiteMark == webSiteMark)
                   .OrderBy(o => o.WebSiteAccountToken)
                   .ToPage(pageParam);
 
