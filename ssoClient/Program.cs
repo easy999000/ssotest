@@ -1,4 +1,8 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.IdentityModel.Tokens;
+using ssoClient.Common;
 using ssoCommon;
+using System.Text;
 
 namespace ssoClient
 {
@@ -12,6 +16,32 @@ namespace ssoClient
             builder.Services.AddSession(a => { });
             // Add services to the container.
             builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
+
+            
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie()
+                .AddJwtBearer("HqbuySSOJWT", o =>
+                {
+                    o.TokenValidationParameters=new TokenValidationParameters();
+                    o.RequireHttpsMetadata = false;
+                    //是否验证发行人
+                    o.TokenValidationParameters.ValidateIssuer = true;
+                    o.TokenValidationParameters.ValidIssuer = "HqbuySSOCenter_ApiClient";
+
+                    o.TokenValidationParameters.ValidateAudience=false;
+
+                    o.TokenValidationParameters.ValidateLifetime = true; //验证生命周期
+                    o.TokenValidationParameters.RequireExpirationTime = true; //过期时间
+                    o.TokenValidationParameters.ClockSkew = TimeSpan.FromMinutes(2);
+
+                    //是否验证密钥
+                    o.TokenValidationParameters.ValidateIssuerSigningKey = true;
+                    o.TokenValidationParameters.IssuerSigningKey = new SymmetricSecurityKey(JwtHelper.DecodeKey(JwtHelper.jwtKey));
+
+
+                });
+
+            builder.Services.AddAuthorization();
 
             var app = builder.Build();
 
@@ -29,11 +59,12 @@ namespace ssoClient
                 app.UseHsts();
             }
 
-          //  app.UseHttpsRedirection();
+            //  app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSession();
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.Use((context, next) =>
@@ -41,7 +72,7 @@ namespace ssoClient
                 if (string.IsNullOrWhiteSpace(ConfigOption.DefaultConfig.CurrentDomain)
                     && context.Request.Host.Host.Contains('.'))
                 {
-                    ConfigOption.DefaultConfig.CurrentDomain ="http://"+ context.Request.Host.ToString();
+                    ConfigOption.DefaultConfig.CurrentDomain = "http://" + context.Request.Host.ToString();
                 }
 
                 return next.Invoke();

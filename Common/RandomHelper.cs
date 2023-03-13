@@ -14,7 +14,7 @@ namespace Common
     public class RandomHelper
     {
         private static readonly RandomNumberGenerator CryptoRandom = RandomNumberGenerator.Create();
-
+ 
 
         public static byte[] GetBytes(int Length)
         {

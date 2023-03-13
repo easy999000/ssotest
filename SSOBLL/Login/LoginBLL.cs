@@ -1,6 +1,7 @@
 ﻿using Common;
 using Microsoft.IdentityModel.Logging;
 using SSOBLL.ApiClient;
+using SSOBLL.JWT;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -51,6 +52,15 @@ namespace SSOBLL.Login
                 return res.SetError(3, "站点未授权");
             }
             res.Data = (null, null, site.ViewName);
+
+           // var key = JwtHelper.MakeHS265Key();
+            
+            
+            var jwt = JwtHelper.CreateToken(site.WebSiteMark, JwtHelper.jwtKey);
+
+
+
+
             ///判断用户是否已经登入
             /// 
 
@@ -123,7 +133,8 @@ namespace SSOBLL.Login
             LoginToken loginToken3 = LoginToken.MakeLoginToken(account, role.ID);
 
             ///生成站点令牌信息
-            WebSiteAccountToken webSiteAccountToken3 = WebSiteAccountToken.MakeWebSiteAccountToken(loginToken3.LoginToken, site.WebSiteMark);
+            WebSiteAccountToken webSiteAccountToken3 = WebSiteAccountToken.MakeWebSiteAccountToken(loginToken3.LoginToken
+                , site.WebSiteMark);
 
             loginToken3.WebSiteAccountList.Add(new WebsiteAccountDTO
             {
@@ -134,7 +145,8 @@ namespace SSOBLL.Login
 
             loginToken3.SaveLoginTokenToRedis();
             ///生成跳转令牌
-            JumpToken jumpToken3 = JumpToken.MakeJumpToken(webSiteAccountToken3.WebSiteAccountToken, webSiteAccountToken3.WebSiteMark);
+            JumpToken jumpToken3 = JumpToken.MakeJumpToken(webSiteAccountToken3.WebSiteAccountToken
+                , webSiteAccountToken3.WebSiteMark);
 
             loginCookie.AddLoginToken(loginToken3);
 
@@ -234,14 +246,14 @@ namespace SSOBLL.Login
                         .ContinueWith((tres) =>
                         {
                             if (tres.Status == TaskStatus.Faulted)
-                            { 
+                            {
                                 if (tres.Exception != null)
                                 {
                                     LoggerHelper.LogError(tres.Exception, tres.Exception.Message);
-                                     
+
                                 }
                             }
-                             
+
                         });
 
                     tasks.Add(t1);
@@ -250,7 +262,7 @@ namespace SSOBLL.Login
                 catch (Exception ex)
                 {
                     LoggerHelper.LogError(ex, ex.Message);
-                     
+
                 }
             }
 

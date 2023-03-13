@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.DataProtection;
+﻿using Common;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -28,16 +29,29 @@ namespace SSOBLL.Login
         {
             var protector = protectorProviderProvider.CreateProtector("SSOBLL.Login.DataProtector");
             var json = Cookies[Constant.SSOCenterLoginCookieName];
+
             if (json == null)
             {
-                return new LoginCookie() { _protector= protector };
+                return new LoginCookie() { _protector = protector };
+            }
+            try
+            {
+                //#if !DEBUG
+                json = protector.Unprotect(json);
+                //#endif
+            }
+            catch (System.Security.Cryptography.CryptographicException ex1)
+            {
+                LoggerHelper.LogError(ex1, "FromCookieValue");
+                return new LoginCookie() { _protector = protector };
             }
 
-//#if !DEBUG
-            json=protector.Unprotect(json);
-//#endif
-
             var cookie = Newtonsoft.Json.JsonConvert.DeserializeObject<LoginCookie>(json);
+            if (cookie == null)
+            {
+                return new LoginCookie() { _protector = protector };
+            }
+
             cookie.RemoveLoginOutToken();
 
             cookie._protector = protector;

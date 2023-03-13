@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ssoClient.Models;
 using ssoCommon;
@@ -67,7 +68,7 @@ namespace ssoClient.Controllers
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-
+        //[Authorize]
         public ApiMsg Logout2( WebsiteLogoutParam param = null)
         {
             if (param == null)
