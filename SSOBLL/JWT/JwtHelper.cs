@@ -18,9 +18,13 @@ namespace SSOBLL.JWT
         public JwtHelper()
         {
         } 
-        public static string Issuer = "HqbuySSOCenter_ApiClient";
 
-        public static string PolicyName = "HqbuyApiJwtPolicy";
+        public static string Issuer = "SSOCenter_ApiClient";
+
+        public static string SchemeName = "ApiJwtScheme";
+
+        public static string SSOAuthorizationPllicy = "ApiJwtPllicy";
+
 
 
         public static string CreateToken(string webSiteMark, string secretKey)

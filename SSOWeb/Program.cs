@@ -1,13 +1,18 @@
 using Common;
 using FreeSqlExtend;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using SSOBLL;
+using SSOBLL.DBModel;
 using SSOBLL.ExpiredMonitor;
+using SSOBLL.JWT;
+using SSOBLL.Login;
 using System.Diagnostics;
 
 namespace SSOWeb
@@ -17,11 +22,9 @@ namespace SSOWeb
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
- 
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
-
 
             ///配置 IDistributedCache 分布式缓存
             ///
@@ -31,11 +34,7 @@ namespace SSOWeb
                 options.Configuration = redisConnStr;
                 // options.InstanceName = "SampleInstance";
 
-
             });
-            //builder.Services.AddDistributedMemoryCache(option => { 
-
-            //});
 
             ///分布式部署,配置秘钥在redis存储
             builder.Services.AddDataProtection()
@@ -51,6 +50,28 @@ namespace SSOWeb
                 }); ;
 
 
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie()
+                .AddJwtBearer(JwtHelper.SchemeName, o =>
+                {
+                    o.TokenValidationParameters = new TokenValidationParameters();
+                    o.RequireHttpsMetadata = false;
+                    //是否验证发行人
+                    o.TokenValidationParameters.ValidateIssuer = true;
+                    o.TokenValidationParameters.ValidIssuer = JwtHelper.Issuer;
+
+                    o.TokenValidationParameters.ValidateAudience = false;
+
+                    o.TokenValidationParameters.ValidateLifetime = true; //验证生命周期
+                    o.TokenValidationParameters.RequireExpirationTime = true; //过期时间
+                    o.TokenValidationParameters.ClockSkew = TimeSpan.FromMinutes(2);
+
+                    //是否验证密钥
+                    o.TokenValidationParameters.ValidateIssuerSigningKey = true;
+                    // o.TokenValidationParameters.IssuerSigningKey = new SymmetricSecurityKey(JwtHelper.DecodeKey(JwtHelper.jwtKey));
+                    o.TokenValidationParameters.IssuerSigningKeyResolver = IssuerSigningKeyResolver;
+
+                });
 
             ///session配置
             builder.Services.AddSession(options =>
@@ -58,7 +79,7 @@ namespace SSOWeb
 
             });
 
-            var app = builder.Build(); 
+            var app = builder.Build();
 
             var provider = app.Services;
             LoggerHelper.Init(provider.GetService<ILogger<LoggerHelper>>());
@@ -82,7 +103,7 @@ namespace SSOWeb
                         break;
                     default:
                         break;
-                } 
+                }
             };
 
             //配置缓存帮助类
@@ -118,6 +139,29 @@ namespace SSOWeb
             TokenExpired.Subscribe();
 
             app.Run();
+        }
+
+        private static IEnumerable<SecurityKey> IssuerSigningKeyResolver(string token, SecurityToken securityToken, string kid, TokenValidationParameters validationParameters)
+        {
+            var jwtToken = securityToken as System.IdentityModel.Tokens.Jwt.JwtSecurityToken;
+
+            if (jwtToken == null)
+            {
+                return new List<SecurityKey> { };
+            }
+
+            var WebSiteMark = jwtToken.Claims.FirstOrDefault(f => f.Type == "WebSiteMark");
+            if (WebSiteMark == null)
+            {
+                return new List<SecurityKey> { };
+            } 
+
+            var secret = WebSite.GetWebSiteSecret_Catch(WebSiteMark.Value);
+
+            var key = new SymmetricSecurityKey(JwtHelper.DecodeKey(secret.Key1));
+
+            return new List<SecurityKey> { key };
+             
         }
     }
 }

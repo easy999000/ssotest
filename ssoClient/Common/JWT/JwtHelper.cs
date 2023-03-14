@@ -1,4 +1,4 @@
-﻿ 
+﻿
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -11,15 +11,18 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace ssoClient.Common
+namespace ssoClient.Common.JWT
 {
     public class JwtHelper
-    {
-        public static string jwtKey = "nqWxPZSECWJeGF6WqfBUsQw8MHdeU3";
+    { 
 
-        public static string Issuer = "HqbuySSOCenter_ApiClient";
+        public static string Issuer = "SSOCenter_ApiClient";
 
-        public static string SchemeName = "HqbuyApiJwtScheme";
+        public static string SchemeName = "ApiJwtScheme";
+
+        public static string SSOAuthorizationPllicy = "ApiJwtPllicy";
+
+        
         public JwtHelper()
         {
         }
@@ -52,9 +55,9 @@ namespace ssoClient.Common
             return token;
         }
 
-       
+
         public static byte[] DecodeKey(string secretKey)
-        { 
+        {
 
             var bytes = WebEncoders.Base64UrlDecode(secretKey);
 

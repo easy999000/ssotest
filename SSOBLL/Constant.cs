@@ -57,6 +57,10 @@ namespace SSOBLL
         /// WebSiteAccountToken前缀
         /// </summary>
         public const string WebSiteSecretPrefix = "SSO:WebSiteSecretPrefix:";
+        /// <summary>
+        /// WebSiteAccountToken前缀
+        /// </summary>
+        public const string WebSitePrefix = "SSO:WebSitePrefix:";
         
     }
 }

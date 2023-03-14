@@ -1,6 +1,7 @@
 ﻿using SSOBLL.ApiClient.ApiModel;
 using SSOBLL.DBModel;
 using SSOBLL.JWT;
+using SSOBLL.Login;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -70,7 +71,7 @@ namespace SSOBLL.ApiClient
         /// <returns></returns>
         public static async Task<ApiMsg> LogoutAccountAsync(string url, string webSiteAccountToken, WebSiteInfo webSite)
         {
-            var secret = WebSiteSecretBLL.GetWebSiteSecret(webSite.ID);
+            var secret = WebSite.GetWebSiteSecret_Catch(webSite.WebSiteMark);
 
             var jwtToken = JwtHelper.CreateToken(webSite.WebSiteMark, secret.Key1);
 
@@ -86,7 +87,7 @@ namespace SSOBLL.ApiClient
         /// <returns></returns>
         public static async Task<ApiMsg> RenewalAccountAsync(string url, List<string> webSiteAccountTokenList, WebSiteInfo webSite)
         {
-            var secret = WebSiteSecretBLL.GetWebSiteSecret(webSite.ID);
+            var secret = WebSite.GetWebSiteSecret_Catch(webSite.WebSiteMark);
 
             var jwtToken = JwtHelper.CreateToken(webSite.WebSiteMark, secret.Key1);
 

@@ -69,8 +69,8 @@ namespace ssoClient.Controllers
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        [Authorize(Policy = "HqbuyApiJwt")]
-        public ApiMsg Logout2( WebsiteLogoutParam param = null)
+        [Authorize(Policy = "ApiJwtPllicy")]
+        public ApiMsg SSOLogout( WebsiteLogoutParam param = null)
         {
             if (param == null)
             {

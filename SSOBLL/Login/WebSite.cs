@@ -1,5 +1,6 @@
 ﻿using Common;
 using SSOBLL.DBModel;
+using SSOBLL.JWT;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +33,7 @@ namespace SSOBLL.Login
             ///l.atest.com
             ///atest.com
 
-            host="."+host;
+            host = "." + host;
             var webList = GetWebSiteInfoList();
             if (webList == null)
             {
@@ -57,22 +58,47 @@ namespace SSOBLL.Login
             return SqlHelper.Select<WebSiteInfo>()
                   .Where(w => w.ID == id)
                   .First();
-            //var webList = GetWebSiteInfoListCatch();
-            //if (webList == null)
-            //{
-            //    return null;
-            //}
-
-            //var webSite = webList.Where(w => w.ID == id).FirstOrDefault();
-
-            //return webSite;
         }
 
-        public static List<WebSite> ListWebSiteBySecretKey(List<string> secretKeys)
+        public static List<WebSite> ListWebSiteByMark(List<string> webSiteMarkList)
         {
             return SqlHelper.Select<WebSiteInfo>()
-                  .Where(w => secretKeys.Contains(w.WebSiteMark))
+                  .Where(w => webSiteMarkList.Contains(w.WebSiteMark))
                   .ToList<WebSite>();
+        }
+
+        public static WebSiteSecret GetWebSiteSecret_Catch(string webSiteMark)
+        {
+            return CatchHelper.GetOrSet(Constant.WebSiteSecretPrefix + webSiteMark, () =>
+            { 
+                var webSite = SqlHelper.Select<WebSiteInfo>()
+                       .Where(w => w.WebSiteMark == webSiteMark)
+                       .First(); 
+
+                return FreeSqlHelperStatic.Select<WebSiteSecret>()
+                  .Where(w => w.WebSiteID == webSite.ID)
+                  .ToOne();
+            });
+        }
+
+        public static bool CreateWebSiteSecret(int webSiteId)
+        {
+            var key1 = JwtHelper.MakeHS265Key();
+
+            WebSiteSecret webSiteSecret = new WebSiteSecret();
+            webSiteSecret.WebSiteID = webSiteId;
+            webSiteSecret.Key1 = key1;
+            webSiteSecret.Key2 = "";
+
+            var count = FreeSqlHelperStatic.Insert(webSiteSecret)
+                   .ExecuteAffrows();
+
+            if (count > 0)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }
