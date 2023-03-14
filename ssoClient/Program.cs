@@ -20,13 +20,13 @@ namespace ssoClient
             
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie()
-                .AddJwtBearer("HqbuySSOJWT", o =>
+                .AddJwtBearer(JwtHelper.SchemeName, o =>
                 {
                     o.TokenValidationParameters=new TokenValidationParameters();
                     o.RequireHttpsMetadata = false;
                     //是否验证发行人
                     o.TokenValidationParameters.ValidateIssuer = true;
-                    o.TokenValidationParameters.ValidIssuer = "HqbuySSOCenter_ApiClient";
+                    o.TokenValidationParameters.ValidIssuer = JwtHelper.Issuer;
 
                     o.TokenValidationParameters.ValidateAudience=false;
 
@@ -41,7 +41,14 @@ namespace ssoClient
 
                 });
 
-            builder.Services.AddAuthorization();
+            builder.Services.AddAuthorization(option => {
+                option.AddPolicy("HqbuyApiJwt", policy => {
+                    policy.AuthenticationSchemes.Add(JwtHelper.SchemeName);
+                    policy.RequireAuthenticatedUser();
+                   
+
+                });
+            });
 
             var app = builder.Build();
 

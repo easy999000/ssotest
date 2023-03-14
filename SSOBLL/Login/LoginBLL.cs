@@ -1,6 +1,7 @@
 ﻿using Common;
 using Microsoft.IdentityModel.Logging;
 using SSOBLL.ApiClient;
+using SSOBLL.DBModel;
 using SSOBLL.JWT;
 using System;
 using System.Collections.Generic;
@@ -52,14 +53,7 @@ namespace SSOBLL.Login
                 return res.SetError(3, "站点未授权");
             }
             res.Data = (null, null, site.ViewName);
-
-           // var key = JwtHelper.MakeHS265Key();
-            
-            
-            var jwt = JwtHelper.CreateToken(site.WebSiteMark, JwtHelper.jwtKey);
-
-
-
+             
 
             ///判断用户是否已经登入
             /// 
@@ -242,7 +236,7 @@ namespace SSOBLL.Login
                 }
                 try
                 {
-                    var t1 = WebSiteClient.LogoutAccountAsync(website.LogoutApi, item.WebSiteAccountToken)
+                    var t1 = WebSiteClient.LogoutAccountAsync(website.LogoutApi, item.WebSiteAccountToken, website)
                         .ContinueWith((tres) =>
                         {
                             if (tres.Status == TaskStatus.Faulted)

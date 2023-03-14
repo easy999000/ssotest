@@ -1,4 +1,6 @@
 ﻿using SSOBLL.ApiClient.ApiModel;
+using SSOBLL.DBModel;
+using SSOBLL.JWT;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,18 +28,37 @@ namespace SSOBLL.ApiClient
             client = new HttpClient(handler);
         }
 
-        public async Task<T> ApiPostAsync<T>(string url, object data) where T : class
+        public async Task<T> ApiPostAsync<T>(string url, object data, string JwtToken = null) where T : class
         {
-            var response = await client.PostAsJsonAsync(url, data);
 
-            var res = await response.Content.ReadFromJsonAsync<T>();
+            //var response = await client.PostAsJsonAsync(url, data);
 
-            //var response = await client.PostAsync(url
-            //    , new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(data)));
+            //var res = await response.Content.ReadFromJsonAsync<T>();
 
-            //var json = await response.Content.ReadAsStringAsync();
+            var content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(data));
 
-            //var res = Newtonsoft.Json.JsonConvert.DeserializeObject<T>(json);
+            //if (!string.IsNullOrWhiteSpace(JwtToken))
+            //{
+            //    content.Headers.Add("Authorization", $"Bearer {JwtToken}");
+
+            //}
+
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, url);
+            request.Content= content;
+
+            request.Headers.Authorization=new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer",JwtToken);
+
+            var response3 = await client.SendAsync(request);
+
+            var json = await response3.Content.ReadAsStringAsync();
+
+            //var response2 = await client.PostAsync(url
+            //    , content
+            //     );
+
+            //var json = await response2.Content.ReadAsStringAsync();
+
+            var res = Newtonsoft.Json.JsonConvert.DeserializeObject<T>(json);
 
             return res;
         }
@@ -47,11 +68,15 @@ namespace SSOBLL.ApiClient
         /// <param name="url"></param>
         /// <param name="webSiteAccountToken"></param>
         /// <returns></returns>
-        public static async Task<ApiMsg> LogoutAccountAsync(string url, string webSiteAccountToken)
+        public static async Task<ApiMsg> LogoutAccountAsync(string url, string webSiteAccountToken, WebSiteInfo webSite)
         {
+            var secret = WebSiteSecretBLL.GetWebSiteSecret(webSite.ID);
+
+            var jwtToken = JwtHelper.CreateToken(webSite.WebSiteMark, secret.Key1);
+
             WebsiteLogoutParam param = new WebsiteLogoutParam() { WebSiteAccountToken = webSiteAccountToken };
 
-            return await StaticClient.ApiPostAsync<ApiMsg>(url, param);
+            return await StaticClient.ApiPostAsync<ApiMsg>(url, param, jwtToken);
         }
         /// <summary>
         /// 续期账号在线状态
@@ -59,11 +84,15 @@ namespace SSOBLL.ApiClient
         /// <param name="url"></param>
         /// <param name="webSiteAccountToken"></param>
         /// <returns></returns>
-        public static async Task<ApiMsg> RenewalAccountAsync(string url, List<string> webSiteAccountTokenList)
+        public static async Task<ApiMsg> RenewalAccountAsync(string url, List<string> webSiteAccountTokenList, WebSiteInfo webSite)
         {
+            var secret = WebSiteSecretBLL.GetWebSiteSecret(webSite.ID);
+
+            var jwtToken = JwtHelper.CreateToken(webSite.WebSiteMark, secret.Key1);
+
             RenewalAccountParam param = new RenewalAccountParam() { WebSiteAccountTokenList = webSiteAccountTokenList };
 
-            return await StaticClient.ApiPostAsync<ApiMsg>(url, param);
+            return await StaticClient.ApiPostAsync<ApiMsg>(url, param, jwtToken);
 
         }
 

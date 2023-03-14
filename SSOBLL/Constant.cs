@@ -52,5 +52,11 @@ namespace SSOBLL
         /// 
         /// </summary>
         public const string RenewalLoginTokenLock = "SSO:RenewalLoginTokenLock";
+
+        /// <summary>
+        /// WebSiteAccountToken前缀
+        /// </summary>
+        public const string WebSiteSecretPrefix = "SSO:WebSiteSecretPrefix:";
+        
     }
 }

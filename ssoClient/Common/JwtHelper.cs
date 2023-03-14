@@ -15,8 +15,11 @@ namespace ssoClient.Common
 {
     public class JwtHelper
     {
-        public static string jwtKey = "gAiG9oMvXKyzC9IQhEE6rMi9Kib0cBLRpt8Z-EeafT9QeUkPNie7zGxZRoaKbJEwfHwOWokjoSEYfFUstsRxCInFL44jA7x_0B6Jfk_tTkkF4jXZzmPGzUL3z9oj_-L3k_CtJJOyh6U1Pn5J_0ZKqDTg6RnFa9WTEKpjPorL7Hc5gaGj2qpQSxbcUTwDlhGKPXVg8LO5P5sYvZsCrsz3X2m709k7GcVk58PZ39Sez-4Z7aKJz5syVpagyzEuxqLs8xdRIuXDMZOaoXdiFNigRtSTMUwNAZIr8h8rNYEkVSmlOeMgz52oq3UVXMf2uOHoLYiudJ2rNrwIMdWrZLTko1Ae70VJo9Tvjg";
+        public static string jwtKey = "nqWxPZSECWJeGF6WqfBUsQw8MHdeU3";
 
+        public static string Issuer = "HqbuySSOCenter_ApiClient";
+
+        public static string SchemeName = "HqbuyApiJwtScheme";
         public JwtHelper()
         {
         }
@@ -37,8 +40,8 @@ namespace ssoClient.Common
             var signingCredentials = new SigningCredentials(secretKey2, algorithm);
             // 5. 根据以上，生成token
             var jwtSecurityToken = new JwtSecurityToken(
-                "HqbuySSOCenter_ApiClient",     //Issuer
-                "",   //Audience
+                Issuer,     //Issuer
+                webSiteMark,   //Audience
                 claims,                          //Claims,
                 DateTime.Now,                    //notBefore
                 DateTime.Now.AddMinutes(3),    //expires

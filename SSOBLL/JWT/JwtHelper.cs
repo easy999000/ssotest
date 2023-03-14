@@ -17,10 +17,11 @@ namespace SSOBLL.JWT
     {
         public JwtHelper()
         {
-        }
-        public static string jwtKey = "gAiG9oMvXKyzC9IQhEE6rMi9Kib0cBLRpt8Z-EeafT9QeUkPNie7zGxZRoaKbJEwfHwOWokjoSEYfFUstsRxCInFL44jA7x_0B6Jfk_tTkkF4jXZzmPGzUL3z9oj_-L3k_CtJJOyh6U1Pn5J_0ZKqDTg6RnFa9WTEKpjPorL7Hc5gaGj2qpQSxbcUTwDlhGKPXVg8LO5P5sYvZsCrsz3X2m709k7GcVk58PZ39Sez-4Z7aKJz5syVpagyzEuxqLs8xdRIuXDMZOaoXdiFNigRtSTMUwNAZIr8h8rNYEkVSmlOeMgz52oq3UVXMf2uOHoLYiudJ2rNrwIMdWrZLTko1Ae70VJo9Tvjg";
-
+        } 
         public static string Issuer = "HqbuySSOCenter_ApiClient";
+
+        public static string PolicyName = "HqbuyApiJwtPolicy";
+
 
         public static string CreateToken(string webSiteMark, string secretKey)
         {
@@ -40,7 +41,7 @@ namespace SSOBLL.JWT
             // 5. 根据以上，生成token
             var jwtSecurityToken = new JwtSecurityToken(
                 Issuer,     //Issuer
-                "",   //Audience
+                webSiteMark,   //Audience
                 claims,                          //Claims,
                 DateTime.Now.AddMinutes(-1),                    //notBefore
                 DateTime.Now.AddMinutes(300),    //expires
@@ -53,14 +54,15 @@ namespace SSOBLL.JWT
 
         public static string MakeHS265Key()
         {
-            var bytes = RandomHelper.GetBytes(265);
+            Random random = new Random();
+            var count = random.Next(30, 35);
 
-            var str = WebEncoders.Base64UrlEncode(bytes);
-
+            var str = RandomHelper.GetString(count);
+              
             return str;
         }
         public static byte[] DecodeKey(string secretKey)
-        { 
+        {
 
             var bytes = WebEncoders.Base64UrlDecode(secretKey);
 

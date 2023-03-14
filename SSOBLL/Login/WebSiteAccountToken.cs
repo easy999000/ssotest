@@ -115,7 +115,13 @@ namespace SSOBLL.Login
             return page;
         }
 
-        public static ApiMsg RenewalLoginTokenAsync(string url, List<string> websiteAccountTokenList)
+        /// <summary>
+        /// 续期
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="websiteAccountTokenList"></param>
+        /// <returns></returns>
+        public static ApiMsg RenewalLoginTokenAsync(string url, List<string> websiteAccountTokenList,WebSiteInfo webSite)
         {
             try
             {
@@ -129,7 +135,7 @@ namespace SSOBLL.Login
                     return ApiMsg.ReturnSuccess();
                 }
 
-                return WebSiteClient.RenewalAccountAsync(url, websiteAccountTokenList).Result;
+                return WebSiteClient.RenewalAccountAsync(url, websiteAccountTokenList, webSite).Result;
 
             }
             catch (Exception ex)
