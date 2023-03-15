@@ -1,7 +1,10 @@
 ﻿using Common;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using SSOBLL;
+using SSOBLL.ApiClient;
+using SSOBLL.ApiClient.ApiModel;
 using SSOBLL.Login;
 using SSOWeb.Models;
 
@@ -99,15 +102,19 @@ namespace SSOWeb.Controllers
         /// </summary>
         /// <param name="jumpUrl"></param>
         /// <returns></returns>
-        public IActionResult Logout(string jumpUrl)
+        public IActionResult Logout(string jumpUrl = "")
         {
+            if (string.IsNullOrWhiteSpace(jumpUrl))
+            {
+                return Redirect($"https://www.hqbuy.com?sso={0}");
+            }
             var loginCookie = LoginCookie.FromCookieValue(this.Request.Cookies, _protectorProviderProvider);
 
             UrlHelper jumpUrlHelper;
             UrlHelper.TryParse(jumpUrl, out jumpUrlHelper);
 
             LoginBLL loginBLL = new LoginBLL();
-            var check = loginBLL.Logut(jumpUrl
+            var check = loginBLL.Logout(jumpUrl
                 , loginCookie);
 
 
@@ -130,6 +137,14 @@ namespace SSOWeb.Controllers
             //带回错误代码
 
             return Redirect(jumpUrlHelper.GetUrl());
+
+        }
+
+        [Authorize(Policy = "ApiJwtPllicy")]
+        public ApiMsg<LoginAccount> CheckJumpToken([FromBody] CheckJumpTokenParam param = null)
+        {
+            LoginBLL loginBLL = new LoginBLL();
+            return loginBLL.CheckJumpToken(param.JumpToken, param.WebSiteMark);
 
         }
     }

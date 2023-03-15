@@ -36,28 +36,29 @@ namespace SSOBLL.ApiClient
 
             //var res = await response.Content.ReadFromJsonAsync<T>();
 
-            var content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(data));
 
             //if (!string.IsNullOrWhiteSpace(JwtToken))
             //{
             //    content.Headers.Add("Authorization", $"Bearer {JwtToken}");
 
             //}
-
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, url);
-            request.Content= content;
-
-            request.Headers.Authorization=new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer",JwtToken);
-
-            var response3 = await client.SendAsync(request);
-
-            var json = await response3.Content.ReadAsStringAsync();
-
             //var response2 = await client.PostAsync(url
             //    , content
             //     );
 
             //var json = await response2.Content.ReadAsStringAsync();
+            var content = JsonContent.Create(data);
+           // var content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(data));
+
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, url);
+            request.Content = content;
+
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", JwtToken);
+
+            var response3 = await client.SendAsync(request);
+
+            var json = await response3.Content.ReadAsStringAsync();
+
 
             var res = Newtonsoft.Json.JsonConvert.DeserializeObject<T>(json);
 

@@ -47,7 +47,7 @@ namespace ssoClient.Common.JWT
                 webSiteMark,   //Audience
                 claims,                          //Claims,
                 DateTime.Now,                    //notBefore
-                DateTime.Now.AddMinutes(3),    //expires
+                DateTime.Now.AddMinutes(300),    //expires
                 signingCredentials               //Credentials
             );
             // 6. 将token变为string

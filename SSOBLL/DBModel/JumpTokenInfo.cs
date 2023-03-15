@@ -22,7 +22,7 @@ namespace SSOBLL.DBModel {
 		public string WebSiteAccountToken { get; set; }
 
 		[JsonProperty, Column(StringLength = 50, IsNullable = false)]
-		public string WebSiteSecretKey { get; set; }
+		public string WebSiteMark { get; set; }
 
 	}
 

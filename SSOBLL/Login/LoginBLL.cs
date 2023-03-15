@@ -1,6 +1,7 @@
 ﻿using Common;
 using Microsoft.IdentityModel.Logging;
 using SSOBLL.ApiClient;
+using SSOBLL.ApiClient.ApiModel;
 using SSOBLL.DBModel;
 using SSOBLL.JWT;
 using System;
@@ -53,7 +54,7 @@ namespace SSOBLL.Login
                 return res.SetError(3, "站点未授权");
             }
             res.Data = (null, null, site.ViewName);
-             
+
 
             ///判断用户是否已经登入
             /// 
@@ -161,7 +162,7 @@ namespace SSOBLL.Login
         /// <param name="pass"></param>
         /// <param name="WebSiteID"></param>
         /// <returns></returns>
-        public ApiMsg<LoginCookie> Logut(string jumpUrl
+        public ApiMsg<LoginCookie> Logout(string jumpUrl
             , LoginCookie loginCookie)
         {
             var res = ApiMsg<LoginCookie>.ReturnError("未知错误");
@@ -277,5 +278,31 @@ namespace SSOBLL.Login
             return isDel;
         }
 
+        
+        public ApiMsg<LoginAccount> CheckJumpToken(string jumpToken, string webSiteMark)
+        {
+            var res = new ApiMsg<LoginAccount>();
+
+            var jump = JumpToken.GetJumpToken(jumpToken);
+            if (jump == null)
+            {
+                return res.SetError("token无效");
+            }
+
+            var webSiteAccount = WebSiteAccountToken.GetWebSiteAccountToken(jump.WebSiteAccountToken);
+            if (webSiteAccount == null)
+            {
+                return res.SetError("找不到WebSiteAccountToken");
+            }
+
+            var loginToken = LoginToken.GetLoginTokenByToken(webSiteAccount.LoginToken);
+            if (loginToken == null)
+            {
+                return res.SetError("找不到loginToken");
+            }
+            return res.SetSuccess(new LoginAccount { Account=loginToken.Account
+                , WebSiteAccountToken=webSiteAccount.WebSiteAccountToken });
+
+        }
     }
 }

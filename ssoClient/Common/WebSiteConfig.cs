@@ -3,9 +3,15 @@
     public class WebSiteConfig
     {
         public static WebSiteConfig Config = new WebSiteConfig();
-        public string JwtSecret = "";
-        public string WebSiteMark = "";
-         
+        /// <summary>
+        /// 
+        /// </summary>
+        public string JwtSecret { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string WebSiteMark { get; set; }
+
     }
 
 }

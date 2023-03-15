@@ -60,7 +60,7 @@ namespace ssoClient
 
             ConfigOption.DefaultConfig = new ConfigOption();
             config.Bind("ConfigOption", ConfigOption.DefaultConfig);
-            config.Bind("WeSitebConfig", WebSiteConfig.Config);
+            config.Bind("WebSiteConfig", WebSiteConfig.Config);
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())

@@ -235,7 +235,7 @@ namespace SSOBLL.ExpiredMonitor
                         try
                         {
 
-                            var page = WebSiteAccountToken.PageWebSiteAccountTokenBySecretKey(currentLoginToken, pageParam);
+                            var page = WebSiteAccountToken.PageWebSiteAccountTokenByWebSiteMark(currentLoginToken, pageParam);
                             if (page.Data.Count < 1)
                             {
                                 break;

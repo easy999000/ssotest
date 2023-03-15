@@ -43,13 +43,13 @@ namespace SSOBLL.Login
             for (int i = 0; i < 20 && !b1; i++)
             {
                 ///防止token生成重复,尝试10次, 
-                res.WebSiteAccountToken = RandomHelper.GetString(25);
+                res.WebSiteAccountToken = RandomHelper.GetString(35);
 
-                var json = Newtonsoft.Json.JsonConvert.SerializeObject(res);
+              //  var json = Newtonsoft.Json.JsonConvert.SerializeObject(res);
 
-                b1 = RedisHelper.DBDefault.StringSet(
+                b1 = RedisHelper.DBDefault.Set(
                     Constant.WebSiteAccountTokenPrefix + res.WebSiteAccountToken
-                 , json, TimeSpan.FromHours(5), when: StackExchange.Redis.When.NotExists);
+                 , res, TimeSpan.FromHours(5), when: StackExchange.Redis.When.NotExists);
             }
 
             SqlHelper.Insert<WebSiteAccountTokenInfo>(res).ExecuteAffrows();
@@ -57,13 +57,11 @@ namespace SSOBLL.Login
             return res;
         }
 
-        //public static List<WebSiteAccountToken> ListWebSiteAccountToken(string loginToken)
-        //{
-        //    return SqlHelper.Select<WebSiteAccountTokenInfo>()
-        //          .Where(w => w.LoginToken == loginToken)
-        //          .Include(i => i.WebSite)
-        //          .ToList<WebSiteAccountToken>();
-        //}
+        public static WebSiteAccountToken GetWebSiteAccountToken(string webSiteAccountToken)
+        {
+            var jump = RedisHelper.DBDefault.Get<WebSiteAccountToken>(Constant.WebSiteAccountTokenPrefix + webSiteAccountToken);
+            return jump;
+        }
 
         /// <summary>
         /// 延迟过期
@@ -105,7 +103,7 @@ namespace SSOBLL.Login
         /// 
         /// </summary>
         /// <returns></returns>
-        public static PageResult<WebSiteAccountToken> PageWebSiteAccountTokenBySecretKey(string webSiteMark, PageParam pageParam)
+        public static PageResult<WebSiteAccountToken> PageWebSiteAccountTokenByWebSiteMark(string webSiteMark, PageParam pageParam)
         {
             var page = SqlHelper.Select<WebSiteAccountToken>()
                   .Where(w => w.WebSiteMark == webSiteMark)

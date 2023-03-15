@@ -8,7 +8,7 @@ namespace ssoCommon
 {
     public class UserInfo
     {
-        public string Name { get; set; }
+        public string Account { get; set; }
         public DateTime LoginTime { get; set; }
 
         public string Mobile { get; set; } = "15999999999";

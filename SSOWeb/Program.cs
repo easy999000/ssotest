@@ -50,6 +50,12 @@ namespace SSOWeb
                 }); ;
 
 
+            ///session配置
+            builder.Services.AddSession(options =>
+            {
+
+            });
+
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie()
                 .AddJwtBearer(JwtHelper.SchemeName, o =>
@@ -64,7 +70,7 @@ namespace SSOWeb
 
                     o.TokenValidationParameters.ValidateLifetime = true; //验证生命周期
                     o.TokenValidationParameters.RequireExpirationTime = true; //过期时间
-                    o.TokenValidationParameters.ClockSkew = TimeSpan.FromMinutes(2);
+                    o.TokenValidationParameters.ClockSkew = TimeSpan.FromMinutes(3);
 
                     //是否验证密钥
                     o.TokenValidationParameters.ValidateIssuerSigningKey = true;
@@ -73,11 +79,17 @@ namespace SSOWeb
 
                 });
 
-            ///session配置
-            builder.Services.AddSession(options =>
+            builder.Services.AddAuthorization(option =>
             {
+                option.AddPolicy(JwtHelper.SSOAuthorizationPllicy, policy =>
+                {
+                    policy.AuthenticationSchemes.Add(JwtHelper.SchemeName);
+                    policy.RequireAuthenticatedUser();
 
+
+                });
             });
+
 
             var app = builder.Build();
 
@@ -125,6 +137,9 @@ namespace SSOWeb
 
             app.UseRouting();
             app.UseSession();
+
+            app.UseAuthentication();
+
             app.UseAuthorization();
 
             app.MapControllerRoute(
