@@ -16,6 +16,7 @@ namespace ssoClient.Controllers
         }
         /// <summary>
         /// 模拟会员中心
+        /// 如果当前未登录,跳转到登入页面
         /// </summary>
         /// <returns></returns>
         public IActionResult Main()
@@ -42,6 +43,7 @@ namespace ssoClient.Controllers
         }
         /// <summary>
         /// 接收sso中心的登入令牌,并验证.
+        /// 验证通过后,进行登入操作.并跳转到指定页面
         /// </summary>
         /// <param name="jumptoken"></param>
         /// <param name="action"></param>
@@ -65,9 +67,13 @@ namespace ssoClient.Controllers
 
             ///存储登陆信息 
             AnalogData.GetAnalogData(AnalogDataEnum.LoginUser).SetData(check.Data.WebSiteAccountToken
-                , new UserInfo { LoginMark= check.Data.WebSiteAccountToken
-                , Account= check.Data.Account
+                , new UserInfo
+                {
+                    LoginMark = check.Data.WebSiteAccountToken
+                ,
+                    Account = check.Data.Account
                 });
+             
 
             if (string.IsNullOrWhiteSpace(mark))
             {
@@ -77,7 +83,7 @@ namespace ssoClient.Controllers
 
             return RedirectToAction(mark);
 
-        } 
+        }
 
         /// <summary>
         /// 退出登入
@@ -85,12 +91,15 @@ namespace ssoClient.Controllers
         /// <param name="param"></param>
         /// <returns></returns>
         [Authorize(Policy = "ApiJwtPllicy")]
-        public ApiMsg SSOLogout([FromBody]WebsiteLogoutParam param = null)
+        public ApiMsg SSOLogout([FromBody] WebsiteLogoutParam param = null)
         {
             if (param == null)
             {
-                return new ApiMsg { Code = 1, Data = this.User.Claims.Count() };
+                return ApiMsg.ReturnError("token无效");
             }
+
+            AnalogData.GetAnalogData(AnalogDataEnum.LoginUser).DelData(param.WebSiteAccountToken);
+
             return new ApiMsg { Code = 1, Data = this.User.Claims.Count() };
         }
 
@@ -104,8 +113,14 @@ namespace ssoClient.Controllers
         {
             if (param == null)
             {
-                return new ApiMsg { Code = 1, Data = this.User.Claims.Count() };
+                return new ApiMsg { Code = 1, Data =0 };
             }
+
+            foreach (var item in param.WebSiteAccountTokenList)
+            {
+                AnalogData.GetAnalogData(AnalogDataEnum.LoginUser).Renewal(item);
+            } 
+
             return new ApiMsg { Code = 1, Data = this.User.Claims.Count() };
         }
 

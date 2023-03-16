@@ -244,9 +244,9 @@ namespace SSOBLL.ExpiredMonitor
                             currentLoginToken = page.Data.Last().LoginToken;
                             pageParam.PageNumber++;
 
-                            WebSiteAccountToken.RenewalLoginTokenAsync(webSite.RenewalApi
-                                , page.Data.Select(s => s.WebSiteAccountToken).ToList()
-                                , webSite);
+                            var check = WebSiteAccountToken.RenewalLoginTokenAsync(webSite.RenewalApi
+                                  , page.Data.Select(s => s.WebSiteAccountToken).ToList()
+                                  , webSite);
 
 
                         }

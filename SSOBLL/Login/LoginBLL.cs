@@ -289,6 +289,8 @@ namespace SSOBLL.Login
                 return res.SetError("token无效");
             }
 
+            JumpToken.DelJumpToken(jumpToken);
+
             var webSiteAccount = WebSiteAccountToken.GetWebSiteAccountToken(jump.WebSiteAccountToken);
             if (webSiteAccount == null)
             {

@@ -47,5 +47,10 @@ namespace SSOBLL.Login
             var jump = RedisHelper.DBDefault.Get<JumpToken>(Constant.JumpTokenRedisPrefix + jumpToken);
             return jump;
         }
+        public static bool DelJumpToken(string jumpToken)
+        {
+            var jump = RedisHelper.DBDefault.KeyDelete(Constant.JumpTokenRedisPrefix + jumpToken);
+            return jump;
+        }
     }
 }
