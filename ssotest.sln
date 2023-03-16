@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ssoClient", "ssoClient\ssoC
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{78C6D054-D498-48C6-BE47-0BD08C713579}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SSOService", "SSOWeb\SSOService.csproj", "{F3F73585-3472-40AA-A4AC-026002BA0D4D}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SSOBLL", "SSOBLL\SSOBLL.csproj", "{185B7164-AE24-4F06-9098-377FD628830D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common", "Common\Common.csproj", "{09852AA9-CB4C-480A-BE1D-D7DFDE4E8335}"
@@ -18,6 +16,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SSOApi", "SSOApi\SSOApi.csproj", "{717D2F90-E91E-4EB1-A25D-AE24504E3956}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FreeSqlExtend", "..\FreeSqlExtend\FreeSqlExtend\FreeSqlExtend.csproj", "{D622CDF1-9FF6-4A00-82AF-11569FEDF6C3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SSOService", "SSOService\SSOService.csproj", "{5B7F4489-605E-4165-B15B-11B4CD2FB7CE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,10 +29,6 @@ Global
 		{37504061-40D6-45B3-82E0-5DA016DD1E3F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{37504061-40D6-45B3-82E0-5DA016DD1E3F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{37504061-40D6-45B3-82E0-5DA016DD1E3F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F3F73585-3472-40AA-A4AC-026002BA0D4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F3F73585-3472-40AA-A4AC-026002BA0D4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F3F73585-3472-40AA-A4AC-026002BA0D4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F3F73585-3472-40AA-A4AC-026002BA0D4D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{185B7164-AE24-4F06-9098-377FD628830D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{185B7164-AE24-4F06-9098-377FD628830D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{185B7164-AE24-4F06-9098-377FD628830D}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -53,6 +49,10 @@ Global
 		{D622CDF1-9FF6-4A00-82AF-11569FEDF6C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D622CDF1-9FF6-4A00-82AF-11569FEDF6C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D622CDF1-9FF6-4A00-82AF-11569FEDF6C3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B7F4489-605E-4165-B15B-11B4CD2FB7CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B7F4489-605E-4165-B15B-11B4CD2FB7CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B7F4489-605E-4165-B15B-11B4CD2FB7CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B7F4489-605E-4165-B15B-11B4CD2FB7CE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
