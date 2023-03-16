@@ -82,7 +82,7 @@ namespace SSOBLL.Login
         /// </summary>
         /// <param name="loginToken"></param>
         /// <returns></returns>
-        public static bool DelayedExpire(string loginToken)
+        public static bool RenewLoginTokena(string loginToken)
         {
             return RedisHelper.DBDefault.KeyExpire(Constant.LoginTokenRedisPrefix + loginToken, TimeSpan.FromHours(2));
         }

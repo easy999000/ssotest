@@ -89,6 +89,38 @@ namespace ssoClient
                 return next.Invoke();
             });
 
+            app.Use((context, next) =>
+            {
+                ///这里做定期续期通知
+
+
+                var loginID = context.Request.Cookies["WebSiteAccountToken"];
+                if (string.IsNullOrWhiteSpace(loginID))
+                {
+                    ///判断是否登入
+                    return next.Invoke();
+                }
+
+                var user = AnalogData.GetAnalogData(AnalogDataEnum.LoginUser).GetData<UserInfo>(loginID);
+                if (user == null)
+                {
+                    ///判断是否登入
+                    return next.Invoke();
+                }
+
+                var dt1 = AnalogData.GetAnalogData(AnalogDataEnum.LoginUser).GetData<long>("RefreshTime");
+                if (dt1 < DateTime.Now.AddMinutes(-10).ToFileTime())
+                {
+                    ///10分钟更新一次
+                    AnalogData.GetAnalogData(AnalogDataEnum.LoginUser).SetData<long>("RefreshTime", DateTime.Now.ToFileTime());
+
+                    APIClient.RenewaWebSiteAccount(new Models.RenewaWebSiteAccountParam { WebSiteAccountToken= user.LoginMark });
+                }
+
+
+                return next.Invoke();
+            });
+
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");

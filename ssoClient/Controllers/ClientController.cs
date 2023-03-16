@@ -9,11 +9,8 @@ using ssoCommon.Api;
 namespace ssoClient.Controllers
 {
     public class ClientController : Controller
-    {
-        public IActionResult Index()
-        {
-            return View();
-        }
+    { 
+
         /// <summary>
         /// 模拟会员中心
         /// 如果当前未登录,跳转到登入页面
@@ -26,7 +23,7 @@ namespace ssoClient.Controllers
 
             string centerUrl = $"{ConfigOption.DefaultConfig.CenterDomain}/sso/login?jumpurl={Uri.EscapeDataString($"{ConfigOption.DefaultConfig.CurrentDomain}/client/VerifyLogin?mark=main")}";
 
-            var loginID = this.Request.Cookies["logintoken"];
+            var loginID = this.Request.Cookies["WebSiteAccountToken"];
 
             ///模拟数据库
             var user = AnalogData.GetAnalogData(AnalogDataEnum.LoginUser).GetData<UserInfo>(loginID);
@@ -41,6 +38,7 @@ namespace ssoClient.Controllers
             ViewBag.User = user;
             return View();
         }
+
         /// <summary>
         /// 接收sso中心的登入令牌,并验证.
         /// 验证通过后,进行登入操作.并跳转到指定页面
@@ -63,7 +61,8 @@ namespace ssoClient.Controllers
                 return Content("授权无效");
             }
 
-            this.Response.Cookies.Append("logintoken", check.Data.WebSiteAccountToken);
+            ///正式系统要做加密,不要把 WebSiteAccountToken暴露出去
+            this.Response.Cookies.Append("WebSiteAccountToken", check.Data.WebSiteAccountToken);
 
             ///存储登陆信息 
             AnalogData.GetAnalogData(AnalogDataEnum.LoginUser).SetData(check.Data.WebSiteAccountToken
@@ -73,7 +72,8 @@ namespace ssoClient.Controllers
                 ,
                     Account = check.Data.Account
                 });
-             
+
+            AnalogData.GetAnalogData(AnalogDataEnum.LoginUser).SetData<long>("RefreshTime", DateTime.Now.ToFileTime());
 
             if (string.IsNullOrWhiteSpace(mark))
             {
@@ -124,7 +124,7 @@ namespace ssoClient.Controllers
             return new ApiMsg { Code = 1, Data = this.User.Claims.Count() };
         }
 
-
+        
 
     }
 }

@@ -30,7 +30,7 @@ public class AnalogData
     /// <typeparam name="T"></typeparam>
     /// <param name="key"></param>
     /// <param name="value"></param>
-    public void SetData<T>(string key, T value) where T : class
+    public void SetData<T>(string key, T value) where T : new()
     {
         Cache.Set(key, value, TimeSpan.FromHours(2));
     }
@@ -41,8 +41,12 @@ public class AnalogData
     /// <typeparam name="T"></typeparam>
     /// <param name="key"></param>
     /// <returns></returns>
-    public T GetData<T>(string key) where T : class
+    public T GetData<T>(string key) where T : new()
     {
+        if (string.IsNullOrWhiteSpace(key))
+        {
+            return default;
+        }
         return Cache.Get<T>(key);
 
     }

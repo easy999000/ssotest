@@ -1,4 +1,5 @@
 ﻿using Common;
+using FreeSql.Internal.ObjectPool;
 using Microsoft.IdentityModel.Logging;
 using SSOBLL.ApiClient;
 using SSOBLL.ApiClient.ApiModel;
@@ -81,13 +82,8 @@ namespace SSOBLL.Login
                 ///生成跳转令牌
                 JumpToken jumpToken2 = JumpToken.MakeJumpToken(webAccount.WebSiteAccountToken, webAccount.WebSiteMark);
 
-
-                LoginToken.DelayedExpire(loginToken2.LoginToken);
-
-                // var webAccountTokenList = WebSiteAccountToken.ListWebSiteAccountToken(loginToken2.LoginToken);
-
-                WebSiteAccountToken.DelayedExpire(loginToken2.WebSiteAccountList.Select(s => s.WebSiteAccountToken).ToArray());
-
+                Renewa(loginToken2);
+                
                 ///返回用户信息
                 return res.SetSuccess((jumpToken2, loginCookie, site.ViewName));
             }
@@ -278,7 +274,7 @@ namespace SSOBLL.Login
             return isDel;
         }
 
-        
+
         public ApiMsg<LoginAccount> CheckJumpToken(string jumpToken, string webSiteMark)
         {
             var res = new ApiMsg<LoginAccount>();
@@ -302,9 +298,29 @@ namespace SSOBLL.Login
             {
                 return res.SetError("找不到loginToken");
             }
-            return res.SetSuccess(new LoginAccount { Account=loginToken.Account
-                , WebSiteAccountToken=webSiteAccount.WebSiteAccountToken });
+            return res.SetSuccess(new LoginAccount
+            {
+                Account = loginToken.Account
+                ,
+                WebSiteAccountToken = webSiteAccount.WebSiteAccountToken
+            });
 
+        }
+
+
+        /// <summary>
+        /// 续期
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public bool Renewa(LoginToken loginToken)
+        {
+            LoginToken.RenewLoginTokena(loginToken.LoginToken);
+
+
+            WebSiteAccountToken.RenewaWebSiteAccountToken(loginToken.WebSiteAccountList.Select(s => s.WebSiteAccountToken).ToArray());
+
+            return true;
         }
     }
 }

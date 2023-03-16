@@ -1,4 +1,5 @@
 ﻿
+using Microsoft.AspNetCore.Mvc;
 using ssoClient.Common.JWT;
 using ssoClient.Models;
 using ssoCommon;
@@ -33,11 +34,11 @@ namespace ssoClient.Common
         {
 
             var content = JsonContent.Create(data);
-         //   var content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(data));
+            //   var content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(data));
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, url);
             request.Content = content;
-            
+
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", JwtToken);
 
             var response3 = await client.SendAsync(request);
@@ -58,9 +59,9 @@ namespace ssoClient.Common
         /// <param name="url"></param>
         /// <param name="webSiteAccountToken"></param>
         /// <returns></returns>
-        public static async Task<ApiMsg<LoginAccount>> CheckJumpTokenAsync( CheckJumpTokenParam param)
+        public static async Task<ApiMsg<LoginAccount>> CheckJumpTokenAsync(CheckJumpTokenParam param)
         {
-            string url = ConfigOption.DefaultConfig.CenterDomain+ @"/sso/CheckJumpToken";
+            string url = ConfigOption.DefaultConfig.CenterDomain + @"/sso/CheckJumpToken";
 
             var jwtToken = JwtHelper.CreateToken(WebSiteConfig.Config.WebSiteMark, WebSiteConfig.Config.JwtSecret);
 
@@ -68,6 +69,19 @@ namespace ssoClient.Common
             return await StaticClient.ApiPostAsync<ApiMsg<LoginAccount>>(url, param, jwtToken);
         }
 
+        /// <summary>
+        /// 续期账号状态
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns> 
+        public static async Task<ApiMsg> RenewaWebSiteAccount(RenewaWebSiteAccountParam param)
+        {
+            string url = ConfigOption.DefaultConfig.CenterDomain + @"/sso/RenewaWebSiteAccount";
+
+            var jwtToken = JwtHelper.CreateToken(WebSiteConfig.Config.WebSiteMark, WebSiteConfig.Config.JwtSecret);
+
+            return await StaticClient.ApiPostAsync<ApiMsg>(url, param, jwtToken);
+        }
 
     }
 }

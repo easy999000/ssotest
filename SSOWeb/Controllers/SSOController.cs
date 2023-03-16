@@ -147,5 +147,34 @@ namespace SSOWeb.Controllers
             return loginBLL.CheckJumpToken(param.JumpToken, param.WebSiteMark);
 
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        [Authorize(Policy = "ApiJwtPllicy")]
+        public ApiMsg RenewaWebSiteAccount([FromBody] RenewaWebSiteAccountParam param = null)
+        {
+            var webToken = WebSiteAccountToken.GetWebSiteAccountToken(param.WebSiteAccountToken);
+            if (webToken == null)
+            {
+                return ApiMsg.ReturnError("WebSiteAccountToken无效");
+            }
+
+            var loginToken = LoginToken.GetLoginTokenByToken(webToken.LoginToken);
+
+            if (loginToken == null)
+            {
+                return ApiMsg.ReturnError("LoginToken无效");
+            }
+
+            LoginBLL loginBLL = new LoginBLL();
+
+            loginBLL.Renewa(loginToken);
+
+            return ApiMsg.ReturnSuccess();
+
+        }
     }
 }

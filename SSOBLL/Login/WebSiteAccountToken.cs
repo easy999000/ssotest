@@ -68,7 +68,7 @@ namespace SSOBLL.Login
         /// </summary>
         /// <param name="loginToken"></param>
         /// <returns></returns>
-        public static bool DelayedExpire(params string[] websiteAccountTokenList)
+        public static bool RenewaWebSiteAccountToken(params string[] websiteAccountTokenList)
         {
             foreach (var item in websiteAccountTokenList)
             {
