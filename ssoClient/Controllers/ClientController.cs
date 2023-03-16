@@ -3,8 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ssoClient.Common;
 using ssoClient.Models;
-using ssoCommon;
-using ssoCommon.Api;
+ 
 
 namespace ssoClient.Controllers
 {

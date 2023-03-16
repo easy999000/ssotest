@@ -1,8 +1,7 @@
 ﻿
 using Microsoft.AspNetCore.Mvc;
 using ssoClient.Common.JWT;
-using ssoClient.Models;
-using ssoCommon;
+using ssoClient.Models; 
 using System;
 using System.Collections.Generic;
 using System.Linq;

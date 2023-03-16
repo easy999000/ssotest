@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.IdentityModel.Tokens;
 using ssoClient.Common;
 using ssoClient.Common.JWT;
-using ssoCommon;
+using ssoClient.Models; 
 using System.Text;
 
 namespace ssoClient

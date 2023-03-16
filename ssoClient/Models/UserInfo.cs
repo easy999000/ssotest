@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ssoCommon
+namespace ssoClient.Models
 {
     public class UserInfo
     {
